@@ -14,7 +14,6 @@ It looked something like this:
 
 Guess a letter: _
 
-
 It was simple, text‑based, and played entirely in the terminal.
 
 ---
@@ -31,11 +30,16 @@ It was simple, text‑based, and played entirely in the terminal.
 - **Responsive Mobile Design**  
   The custom keyboard buttons resize dynamically to fit the screen width, making it easy to play on any device.  
 
+- **2‑Player Mode (Same Device)**  
+  - Player 1 secretly types a word (hidden with •).  
+  - Player 2 guesses using the normal gameplay screen.  
+  - Swap roles for extra fun!
+
 - **PWA Ready**  
   Installable on mobile devices for offline play, with a native‑app feel.
 
 - **Preserved Core Word Bank**  
-  Retains the original word list from the Python version, expanded for more variety.
+  The full ~300 word list from the Python version is included for Single Player mode.
 
 ---
 
@@ -46,6 +50,7 @@ The vision was to bring it to the web and make it:
 - **Accessible** to players on both desktop and mobile.  
 - **Stationary** on mobile (no screen shifting when typing).  
 - **Classic** in style, preserving the nostalgia of Hangman.  
+- **Social**, with a new 2‑Player mode for friends to play together.  
 
 ---
 
@@ -58,18 +63,21 @@ The vision was to bring it to the web and make it:
 
 ## 🎯 How to Play
 1. Open the app in your browser (desktop or mobile).  
-2. **Desktop:** Enter a letter in the input box and click **Guess!**  
-3. **Mobile:** Tap letters on the custom onscreen keyboard.  
-4. Correct guesses fill in the word; wrong guesses draw parts of the hangman.  
-5. Win by guessing the word before the hangman is complete.  
+2. Choose a mode:
+   - **Single Player:** The app picks a random word from the built‑in word bank.  
+   - **2‑Player Mode:** Player 1 enters a secret word; Player 2 tries to guess.  
+3. **Desktop:** Enter a letter in the input box and click **Guess!**  
+4. **Mobile:** Tap letters on the custom onscreen keyboard.  
+5. Correct guesses fill in the word; wrong guesses draw parts of the hangman.  
+6. Win by guessing the word before the hangman is complete.  
 
 ---
 
 ## 📌 Future Ideas
 - Add themes (light/dark mode).  
 - Score tracking across games.  
-- Multiplayer mode.  
+- Online multiplayer using AWS/Firebase.  
 
 ---
 
-⚡ From **a simple Python console game** → to a **modern, responsive, PWA‑ready Hangman app**.
+⚡ From **a simple Python console game** → to a **modern, responsive, PWA‑ready Hangman app with Single & 2‑Player Modes**.
