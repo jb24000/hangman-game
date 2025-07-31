@@ -4,81 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hangman Game</title>
-
-  <!-- PWA Metadata -->
-  <meta name="theme-color" content="#000000" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Hangman">
-
-  <!-- Icons -->
-  <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="icon-192.png">
-
-  <!-- Manifest -->
-  <link rel="manifest" href="manifest.json">
-
-  <!-- Service Worker Registration -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js")
-          .then(() => console.log("✅ Service Worker registered"))
-          .catch(err => console.error("❌ Service Worker error", err));
-      });
-    }
-  </script>
-
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Courier New', monospace;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      min-height: 100vh;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+    body { font-family: 'Courier New', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; }
     .game-container { background: rgba(0, 0, 0, 0.3); border-radius: 15px; padding: 20px; width: 100%; max-width: 500px; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);}
-    .logo { text-align: center; font-size: 16px; white-space: pre; margin-bottom: 20px; color: #ffd700; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);}
     .title { text-align: center; font-size: 24px; margin-bottom: 10px; color: #00ff88;}
     .subtitle { text-align: center; margin-bottom: 20px; opacity: 0.8;}
     .hangman-display { font-family: 'Courier New', monospace; white-space: pre; text-align: center; margin: 20px 0; font-size: 14px; background: rgba(0, 0, 0, 0.2); padding: 15px; border-radius: 10px;}
     .word-display { text-align: center; font-size: 32px; letter-spacing: 8px; margin: 20px 0; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);}
-    .lives-display { text-align: center; font-size: 18px; margin: 15px 0; color: #ff6b6b; font-weight: bold;}
-    .guessed-letters { text-align: center; margin: 15px 0; opacity: 0.8;}
-    .input-section { text-align: center; margin: 20px 0;}
-    .guess-input { font-size: 24px; padding: 15px; border: none; border-radius: 10px; text-align: center; width: 80px; margin: 0 10px; background: rgba(255, 255, 255, 0.9); color: #333; font-weight: bold;}
-    .guess-button { font-size: 18px; padding: 15px 30px; border: none; border-radius: 10px; background: #00ff88; color: #333; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin: 10px;}
-    .guess-button:hover { background: #00cc6a; transform: translateY(-2px);}
-    .new-game-button { background: #ffd700; color: #333;}
-    .new-game-button:hover { background: #ffed4e;}
-    .message { text-align: center; margin: 15px 0; font-size: 18px; font-weight: bold; min-height: 25px;}
-    .success { color: #00ff88;}
-    .error { color: #ff6b6b;}
-    .game-result { text-align: center; font-size: 20px; margin: 20px 0; padding: 20px; border-radius: 10px; font-weight: bold;}
-    .win { background: rgba(0, 255, 136, 0.2); color: #00ff88;}
-    .lose { background: rgba(255, 107, 107, 0.2); color: #ff6b6b;}
-
+    .guess-input, .custom-word-input { font-size: 20px; padding: 10px; border: none; border-radius: 8px; text-align: center; margin: 10px auto; width: 80%; display: block;}
+    .guess-button, .mode-button { font-size: 18px; padding: 12px; border: none; border-radius: 8px; background: #00ff88; color: #333; font-weight: bold; cursor: pointer; margin: 10px auto; display: block; width: 80%; }
+    .guess-button:hover, .mode-button:hover { background: #00cc6a;}
     #keyboard { display: none; flex-direction: column; align-items: center; gap: 10px; margin-top: 15px; width: 100%; }
     .kb-row { display: flex; justify-content: center; gap: 5px; width: 100%; }
-    #keyboard button {
-      flex: 1;
-      min-width: 0;
-      aspect-ratio: 1/1;
-      font-size: 5vw; /* responsive font size */
-      border: none;
-      border-radius: 5px;
-      background: #4CAF50;
-      color: white;
-      cursor: pointer;
-    }
+    #keyboard button { flex: 1; aspect-ratio: 1/1; font-size: 5vw; border: none; border-radius: 5px; background: #4CAF50; color: white; cursor: pointer; }
     #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
-
-    /* Show keyboard on small screens */
     @media (max-width: 768px) {
       #guess-input, #guess-button { display: none; }
       #keyboard { display: flex; }
@@ -87,28 +27,29 @@
 </head>
 <body>
   <div class="game-container">
-    <div class="logo" id="logo">HANGMAN</div>
     <div class="title">🎮 Hangman Game 🎮</div>
-    <div class="subtitle">Guess the word letter by letter!</div>
+    <div class="subtitle">Choose a mode to begin</div>
 
-    <div class="hangman-display" id="hangman-display"></div>
-    <div class="word-display" id="word-display"></div>
-    <div class="lives-display" id="lives-display"></div>
-    <div class="guessed-letters" id="guessed-letters"></div>
+    <button class="mode-button" onclick="startSinglePlayer()">Single Player</button>
+    <button class="mode-button" onclick="showTwoPlayerSetup()">2-Player Mode</button>
 
-    <div class="input-section">
-      <input type="text" class="guess-input" id="guess-input" maxlength="1" placeholder="?">
-      <br>
-      <button class="guess-button" id="guess-button" onclick="makeGuess()">Guess!</button>
+    <div id="two-player-setup" style="display:none; text-align:center;">
+      <p>Player 1: Enter a secret word</p>
+      <input type="password" class="custom-word-input" id="custom-word" placeholder="Secret word">
+      <button class="mode-button" onclick="startTwoPlayer()">Start Game</button>
     </div>
 
-    <div id="keyboard"></div>
-
-    <div class="message" id="message"></div>
-    <div class="game-result" id="game-result"></div>
-
-    <div style="text-align: center;">
-      <button class="guess-button new-game-button" onclick="newGame()">New Game</button>
+    <div id="game-area" style="display:none;">
+      <div class="hangman-display" id="hangman-display"></div>
+      <div class="word-display" id="word-display"></div>
+      <div class="lives-display" id="lives-display"></div>
+      <div class="guessed-letters" id="guessed-letters"></div>
+      <input type="text" class="guess-input" id="guess-input" maxlength="1" placeholder="?">
+      <button class="guess-button" id="guess-button" onclick="makeGuess()">Guess!</button>
+      <div id="keyboard"></div>
+      <div class="message" id="message"></div>
+      <div class="game-result" id="game-result"></div>
+      <button class="mode-button" onclick="newGame()">New Game</button>
     </div>
   </div>
 
@@ -121,7 +62,13 @@
       'october','pickle','quiver','ribbon','simple','things','upward','violet','waffle','yogurt',
       'zipper','always','banana','candle','doctor','engine','finger','handle','iguana','kindly',
       'listen','market','nature','office','person','quarter','reason','summer','turkey','united',
-      'violin','winter','yearly','zombie','apples','bottle','circle'
+      'violin','winter','yearly','zombie','apples','bottle','circle','laptop','keyboard','mouse',
+      'screen','notebook','coffee','printer','remote','charge','energy','family','friend','holiday',
+      'memory','silver','golden','garden','planet','rocket','travel','school','teacher','student',
+      'library','pencil','eraser','marker','supply','subject','lesson','history','future','dreams',
+      'clouds','rainbow','thunder','light','summer','winter','spring','autumn','forest','desert',
+      'mountain','valleys','river','ocean','island','jungle','tiger','lion','giraffe','elephant',
+      'zebra','monkey','panda','whale','dolphin','sharks','eagles','wolves','foxes','rabbits'
     ];
 
     const stages = [
@@ -181,22 +128,37 @@
     let correctLetters = [];
     let lives = 6;
     let gameOver = false;
+    let twoPlayerMode = false;
 
-    function newGame() {
+    function showTwoPlayerSetup() {
+      document.getElementById('two-player-setup').style.display = 'block';
+    }
+
+    function startSinglePlayer() {
+      twoPlayerMode = false;
       currentWord = words[Math.floor(Math.random() * words.length)];
+      startGame();
+    }
+
+    function startTwoPlayer() {
+      const customWord = document.getElementById('custom-word').value.trim().toLowerCase();
+      if (!customWord.match(/^[a-z]+$/)) {
+        alert("Please enter a valid word with only letters.");
+        return;
+      }
+      twoPlayerMode = true;
+      currentWord = customWord;
+      document.getElementById('two-player-setup').style.display = 'none';
+      startGame();
+    }
+
+    function startGame() {
       guessedLetters = [];
       correctLetters = [];
       lives = 6;
       gameOver = false;
-
+      document.getElementById('game-area').style.display = 'block';
       updateDisplay();
-      document.getElementById('message').textContent = '';
-      document.getElementById('game-result').textContent = '';
-      document.getElementById('game-result').className = 'game-result';
-      document.getElementById('guess-input').value = '';
-      document.getElementById('guess-input').disabled = false;
-      document.getElementById('guess-button').disabled = false;
-
       createKeyboard();
     }
 
@@ -223,15 +185,13 @@
 
       if (!guess || guess.length !== 1 || !/[a-z]/.test(guess)) {
         messageEl.textContent = '❌ Please enter a single letter!';
-        messageEl.classList.add('error');
-        if (!letterFromBtn) input.value = '';
+        input.value = '';
         return;
       }
 
       if (guessedLetters.includes(guess)) {
         messageEl.textContent = `❌ You've already guessed '${guess}'!`;
-        messageEl.classList.add('error');
-        if (!letterFromBtn) input.value = '';
+        input.value = '';
         return;
       }
 
@@ -239,50 +199,32 @@
 
       if (currentWord.includes(guess)) {
         correctLetters.push(guess);
-        messageEl.textContent = `✅ Great! '${guess}' is in the word!`;
-        messageEl.classList.add('success');
-
+        messageEl.textContent = `✅ '${guess}' is in the word!`;
         if (currentWord.split('').every(letter => correctLetters.includes(letter))) {
           gameOver = true;
-          document.getElementById('game-result').textContent =
-            `🎉 CONGRATULATIONS! YOU WON! 🎉\nThe word was '${currentWord.toUpperCase()}'`;
-          document.getElementById('game-result').className = 'game-result win';
-          document.getElementById('guess-input').disabled = true;
-          document.getElementById('guess-button').disabled = true;
-          disableKeyboard();
+          document.getElementById('game-result').textContent = `🎉 YOU WON! The word was '${currentWord.toUpperCase()}'`;
         }
       } else {
         lives--;
-        messageEl.textContent = `❌ Sorry! '${guess}' is not in the word.`;
-        messageEl.classList.add('error');
-
+        messageEl.textContent = `❌ '${guess}' is not in the word.`;
         if (lives === 0) {
           gameOver = true;
-          document.getElementById('game-result').textContent =
-            `💀 GAME OVER! 💀\nThe word was '${currentWord.toUpperCase()}'`;
-          document.getElementById('game-result').className = 'game-result lose';
-          document.getElementById('guess-input').disabled = true;
-          document.getElementById('guess-button').disabled = true;
-          disableKeyboard();
+          document.getElementById('game-result').textContent = `💀 GAME OVER! The word was '${currentWord.toUpperCase()}'`;
         }
       }
 
       updateDisplay();
-      if (!letterFromBtn) input.value = '';
+      input.value = '';
     }
 
     function createKeyboard() {
       const kb = document.getElementById('keyboard');
       kb.innerHTML = '';
-      const rows = [
-        'QWERTYUIOP'.split(''),
-        'ASDFGHJKL'.split(''),
-        'ZXCVBNM'.split('')
-      ];
+      const rows = ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
       rows.forEach(row => {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'kb-row';
-        row.forEach(letter => {
+        row.split('').forEach(letter => {
           const btn = document.createElement('button');
           btn.textContent = letter;
           btn.onclick = () => {
@@ -294,19 +236,6 @@
         kb.appendChild(rowDiv);
       });
     }
-
-    function disableKeyboard() {
-      const buttons = document.querySelectorAll('#keyboard button');
-      buttons.forEach(btn => btn.disabled = true);
-    }
-
-    document.getElementById('guess-input').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        makeGuess();
-      }
-    });
-
-    newGame();
   </script>
 </body>
 </html>
