@@ -21,9 +21,28 @@
     .kb-row { display: flex; justify-content: center; gap: 5px; width: 100%; }
     #keyboard button { flex: 1; aspect-ratio: 1/1; font-size: 5vw; border: none; border-radius: 5px; background: #4CAF50; color: white; cursor: pointer; }
     #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
-    .game-result { font-size: 26px; font-weight: bold; text-align: center; margin-top: 20px; }
-    .win { color: #00ff88; }
-    .lose { color: #ff6b6b; }
+
+    /* Overlay styles */
+    #result-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 999;
+      text-align: center;
+    }
+    #result-overlay .result-text {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    #result-overlay.win .result-text { color: #00ff88; }
+    #result-overlay.lose .result-text { color: #ff6b6b; }
     @media (max-width: 768px) {
       #guess-input, #guess-button { display: none; }
       #keyboard { display: flex; }
@@ -53,9 +72,14 @@
       <button class="guess-button" id="guess-button" onclick="makeGuess()">Guess!</button>
       <div id="keyboard"></div>
       <div class="message" id="message"></div>
-      <div class="game-result" id="game-result"></div>
       <button class="mode-button" onclick="newGame()">New Game</button>
     </div>
+  </div>
+
+  <!-- Result Overlay -->
+  <div id="result-overlay">
+    <div class="result-text" id="overlay-text"></div>
+    <button class="mode-button" onclick="newGame()">Play Again</button>
   </div>
 
   <script>
@@ -157,13 +181,13 @@
       lives = 6;
       gameOver = false;
       document.getElementById('game-area').style.display = 'block';
-      document.getElementById('game-result').textContent = '';
-      document.getElementById('game-result').className = 'game-result';
+      document.getElementById('result-overlay').style.display = 'none';
       updateDisplay();
       createKeyboard();
     }
 
     function newGame() {
+      document.getElementById('result-overlay').style.display = 'none';
       if (twoPlayerMode) {
         showTwoPlayerSetup();
       } else {
@@ -189,19 +213,13 @@
       if (gameOver) return;
       const input = document.getElementById('guess-input');
       const guess = (letterFromBtn || input.value).toLowerCase().trim();
-      const messageEl = document.getElementById('message');
-
-      messageEl.textContent = '';
-      messageEl.className = 'message';
 
       if (!guess || guess.length !== 1 || !/[a-z]/.test(guess)) {
-        messageEl.textContent = '❌ Please enter a single letter!';
         input.value = '';
         return;
       }
 
       if (guessedLetters.includes(guess)) {
-        messageEl.textContent = `❌ You've already guessed '${guess}'!`;
         input.value = '';
         return;
       }
@@ -210,21 +228,15 @@
 
       if (currentWord.includes(guess)) {
         correctLetters.push(guess);
-        messageEl.textContent = `✅ '${guess}' is in the word!`;
         if (currentWord.split('').every(letter => correctLetters.includes(letter))) {
           gameOver = true;
-          const result = document.getElementById('game-result');
-          result.textContent = `🎉 YOU WON! 🎉\nThe word was ${currentWord.toUpperCase()}`;
-          result.className = 'game-result win';
+          showResult(true);
         }
       } else {
         lives--;
-        messageEl.textContent = `❌ '${guess}' is not in the word.`;
         if (lives === 0) {
           gameOver = true;
-          const result = document.getElementById('game-result');
-          result.textContent = `💀 GAME OVER! 💀\nThe word was ${currentWord.toUpperCase()}`;
-          result.className = 'game-result lose';
+          showResult(false);
         }
       }
 
@@ -250,6 +262,16 @@
         });
         kb.appendChild(rowDiv);
       });
+    }
+
+    function showResult(win) {
+      const overlay = document.getElementById('result-overlay');
+      const overlayText = document.getElementById('overlay-text');
+      overlay.className = win ? 'win' : 'lose';
+      overlayText.textContent = win 
+        ? `🎉 YOU WON! 🎉\nThe word was ${currentWord.toUpperCase()}`
+        : `💀 GAME OVER! 💀\nThe word was ${currentWord.toUpperCase()}`;
+      overlay.style.display = 'flex';
     }
   </script>
 </body>
