@@ -117,7 +117,7 @@
         function newGame() { /* unchanged */ }
         function updateDisplay() { /* unchanged */ }
         function makeGuess() { /* unchanged */ }
-        document.getElementById('guess-input').addEventListener('keypress', e => { if (e.key === 'Enter') makeGuess(); });
+        document.getElementById('guess-input').addEventListener('keydown', e => { if (e.key === 'Enter') makeGuess(); });
         document.getElementById('guess-input').addEventListener('blur', function() { if (!gameOver) setTimeout(() => this.focus(), 100); });
         newGame();
     </script>
