@@ -31,7 +31,6 @@
   </script>
 
   <style>
-    /* Your original CSS (unchanged) */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Courier New', monospace;
@@ -63,24 +62,32 @@
     .game-result { text-align: center; font-size: 20px; margin: 20px 0; padding: 20px; border-radius: 10px; font-weight: bold;}
     .win { background: rgba(0, 255, 136, 0.2); color: #00ff88;}
     .lose { background: rgba(255, 107, 107, 0.2); color: #ff6b6b;}
-    @media (max-width: 480px) {
-      .word-display { font-size: 24px; letter-spacing: 4px;}
-      .logo { font-size: 12px;}
-      .hangman-display { font-size: 12px;}
+
+    #keyboard { display: none; flex-direction: column; align-items: center; gap: 10px; margin-top: 15px; width: 100%; }
+    .kb-row { display: flex; justify-content: center; gap: 5px; width: 100%; }
+    #keyboard button {
+      flex: 1;
+      min-width: 0;
+      aspect-ratio: 1/1;
+      font-size: 5vw; /* responsive font size */
+      border: none;
+      border-radius: 5px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
+
+    /* Show keyboard on small screens */
+    @media (max-width: 768px) {
+      #guess-input, #guess-button { display: none; }
+      #keyboard { display: flex; }
     }
   </style>
 </head>
 <body>
   <div class="game-container">
-    <div class="logo" id="logo"> _                                             
-| |                                            
-| |__   __ _ _ __   __ _ _ __ ___   __ _ _ __  
-| '_ \ / _` | '_ \ / _` | '_ ` _ \ / _` | '_ \ 
-| | | | (_| | | | | (_| | | | | | | (_| | | | |
-|_| |_|\__,_|_| |_|\__, |_| |_| |_|\__,_|_| |_|
-                    __/ |                      
-                   |___/    </div>
-
+    <div class="logo" id="logo">HANGMAN</div>
     <div class="title">🎮 Hangman Game 🎮</div>
     <div class="subtitle">Guess the word letter by letter!</div>
 
@@ -94,6 +101,8 @@
       <br>
       <button class="guess-button" id="guess-button" onclick="makeGuess()">Guess!</button>
     </div>
+
+    <div id="keyboard"></div>
 
     <div class="message" id="message"></div>
     <div class="game-result" id="game-result"></div>
@@ -187,6 +196,8 @@
       document.getElementById('guess-input').value = '';
       document.getElementById('guess-input').disabled = false;
       document.getElementById('guess-button').disabled = false;
+
+      createKeyboard();
     }
 
     function updateDisplay() {
@@ -201,10 +212,10 @@
         guessedLetters.length > 0 ? `Letters guessed: ${guessedLetters.sort().join(', ')}` : '';
     }
 
-    function makeGuess() {
+    function makeGuess(letterFromBtn = null) {
       if (gameOver) return;
       const input = document.getElementById('guess-input');
-      const guess = input.value.toLowerCase().trim();
+      const guess = (letterFromBtn || input.value).toLowerCase().trim();
       const messageEl = document.getElementById('message');
 
       messageEl.textContent = '';
@@ -213,14 +224,14 @@
       if (!guess || guess.length !== 1 || !/[a-z]/.test(guess)) {
         messageEl.textContent = '❌ Please enter a single letter!';
         messageEl.classList.add('error');
-        input.value = '';
+        if (!letterFromBtn) input.value = '';
         return;
       }
 
       if (guessedLetters.includes(guess)) {
         messageEl.textContent = `❌ You've already guessed '${guess}'!`;
         messageEl.classList.add('error');
-        input.value = '';
+        if (!letterFromBtn) input.value = '';
         return;
       }
 
@@ -238,6 +249,7 @@
           document.getElementById('game-result').className = 'game-result win';
           document.getElementById('guess-input').disabled = true;
           document.getElementById('guess-button').disabled = true;
+          disableKeyboard();
         }
       } else {
         lives--;
@@ -251,16 +263,42 @@
           document.getElementById('game-result').className = 'game-result lose';
           document.getElementById('guess-input').disabled = true;
           document.getElementById('guess-button').disabled = true;
+          disableKeyboard();
         }
       }
 
       updateDisplay();
-      input.value = '';
+      if (!letterFromBtn) input.value = '';
     }
 
-    // Ensure functions are global
-    window.newGame = newGame;
-    window.makeGuess = makeGuess;
+    function createKeyboard() {
+      const kb = document.getElementById('keyboard');
+      kb.innerHTML = '';
+      const rows = [
+        'QWERTYUIOP'.split(''),
+        'ASDFGHJKL'.split(''),
+        'ZXCVBNM'.split('')
+      ];
+      rows.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'kb-row';
+        row.forEach(letter => {
+          const btn = document.createElement('button');
+          btn.textContent = letter;
+          btn.onclick = () => {
+            btn.disabled = true;
+            makeGuess(letter);
+          };
+          rowDiv.appendChild(btn);
+        });
+        kb.appendChild(rowDiv);
+      });
+    }
+
+    function disableKeyboard() {
+      const buttons = document.querySelectorAll('#keyboard button');
+      buttons.forEach(btn => btn.disabled = true);
+    }
 
     document.getElementById('guess-input').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
@@ -272,4 +310,3 @@
   </script>
 </body>
 </html>
-
