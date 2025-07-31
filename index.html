@@ -21,6 +21,9 @@
     .kb-row { display: flex; justify-content: center; gap: 5px; width: 100%; }
     #keyboard button { flex: 1; aspect-ratio: 1/1; font-size: 5vw; border: none; border-radius: 5px; background: #4CAF50; color: white; cursor: pointer; }
     #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
+    .game-result { font-size: 26px; font-weight: bold; text-align: center; margin-top: 20px; }
+    .win { color: #00ff88; }
+    .lose { color: #ff6b6b; }
     @media (max-width: 768px) {
       #guess-input, #guess-button { display: none; }
       #keyboard { display: flex; }
@@ -154,6 +157,8 @@
       lives = 6;
       gameOver = false;
       document.getElementById('game-area').style.display = 'block';
+      document.getElementById('game-result').textContent = '';
+      document.getElementById('game-result').className = 'game-result';
       updateDisplay();
       createKeyboard();
     }
@@ -208,14 +213,18 @@
         messageEl.textContent = `✅ '${guess}' is in the word!`;
         if (currentWord.split('').every(letter => correctLetters.includes(letter))) {
           gameOver = true;
-          document.getElementById('game-result').textContent = `🎉 YOU WON! The word was '${currentWord.toUpperCase()}'`;
+          const result = document.getElementById('game-result');
+          result.textContent = `🎉 YOU WON! 🎉\nThe word was ${currentWord.toUpperCase()}`;
+          result.className = 'game-result win';
         }
       } else {
         lives--;
         messageEl.textContent = `❌ '${guess}' is not in the word.`;
         if (lives === 0) {
           gameOver = true;
-          document.getElementById('game-result').textContent = `💀 GAME OVER! The word was '${currentWord.toUpperCase()}'`;
+          const result = document.getElementById('game-result');
+          result.textContent = `💀 GAME OVER! 💀\nThe word was ${currentWord.toUpperCase()}`;
+          result.className = 'game-result lose';
         }
       }
 
