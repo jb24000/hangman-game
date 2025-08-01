@@ -226,25 +226,28 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 10px;
   width: 100%;
   max-width: 100%;
+  margin-top: 10px;
   overflow-x: hidden;
 }
 
 .kb-row {
-  display: flex;
+  display: grid;
   justify-content: center;
-  flex-wrap: nowrap; /* force row alignment */
+  margin: 2px 0;
 }
 
+.kb-row.row1 { grid-template-columns: repeat(10, 1fr); }
+.kb-row.row2 { grid-template-columns: repeat(9, 1fr); }
+.kb-row.row3 { grid-template-columns: repeat(7, 1fr); }
+
 #keyboard button {
-  flex: 1 0 auto;
+  aspect-ratio: 1 / 1; /* keeps keys square */
+  min-width: 28px;
+  max-width: 40px;
   margin: 1px;
-  width: 9vw;   /* fits 10 keys across small screens */
-  max-width: 36px;
-  height: 40px;
-  font-size: 14px;
+  font-size: clamp(10px, 3vw, 14px);
   font-weight: bold;
   border: none;
   border-radius: 5px;
@@ -256,14 +259,6 @@ body {
 #keyboard button:disabled {
   background: #aaa;
   cursor: not-allowed;
-}
-
-@media (max-width: 480px) {
-  #keyboard button {
-    width: 8.5vw; /* slightly smaller for phones */
-    height: 36px;
-    font-size: 12px;
-  }
 }
 
 
