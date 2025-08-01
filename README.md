@@ -2,15 +2,6 @@
 
 _A modern take on the classic word‑guessing game, now as a Progressive Web App (PWA)!_
 
-_                                             
- | |                                            
- | |__   __ _ _ __   __ _ _ __ ___   __ _ _ __  
- | '_ \ / _` | '_ \ / _` | '_ ` _ \ / _` | '_ \ 
- | | | | (_| | | | | (_| | | | | | | (_| | | | |
- |_| |_|\__,_|_| |_|\__, |_| |_| |_|\__,_|_| |_|
-                     __/ |                      
-                    |___/
-
 ## 🚀 Features
 
 - 🎯 **Single Player & Two Player Modes**
