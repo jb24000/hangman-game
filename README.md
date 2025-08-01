@@ -78,15 +78,18 @@ It was upgraded into this interactive PWA for a polished user experience.
 The game is centered and fixed on all mobile devices.
 No scrolling required—everything fits and is accessible.
 The on-screen keyboard is always three QWERTY rows.
+
 📌 Roadmap
 🌐 Add support for multiplayer over network
 📚 Expand word bank to 1000+ words
 🏅 Achievements for streaks and high scores
+
 📜 License
 MIT License — Free to use, modify, and share.
 
 🙌 Credits
 Icons8 for icons
 Pixabay for free sound effects
+
 Enjoy playing and learning with Hangman!
 
