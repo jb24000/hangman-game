@@ -173,18 +173,18 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin: 10px auto 0;
-  padding: 0 10px;
-  width: 100%;
-  box-sizing: border-box;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .kb-row {
   display: flex;
   justify-content: center;
   gap: 4px;
-  width: 100%;
-  flex-wrap: nowrap;
 }
 
 #keyboard button {
@@ -197,8 +197,7 @@
   background: #4CAF50;
   color: white;
   cursor: pointer;
-  flex-shrink: 1;
-  min-width: 28px;
+  flex-shrink: 0;
 }
 
 #keyboard button:disabled {
@@ -206,61 +205,23 @@
   cursor: not-allowed;
 }
 
-/* Mobile optimizations */
 @media (max-width: 480px) {
   #keyboard {
+    width: fit-content;
+    justify-content: center;
     padding: 0 5px;
-    gap: 6px;
+    margin: 10px auto 0;
   }
   
   .kb-row {
     gap: 2px;
-    justify-content: space-evenly;
-  }
-  
-  /* First row (10 letters) */
-  .kb-row:first-child #keyboard button {
-    width: calc((100vw - 40px) / 10 - 2px);
-    max-width: 32px;
-    min-width: 24px;
-  }
-  
-  /* Second row (9 letters) */
-  .kb-row:nth-child(2) #keyboard button {
-    width: calc((100vw - 36px) / 9 - 2px);
-    max-width: 34px;
-    min-width: 26px;
-  }
-  
-  /* Third row (7 letters) */
-  .kb-row:nth-child(3) #keyboard button {
-    width: calc((100vw - 28px) / 7 - 2px);
-    max-width: 38px;
-    min-width: 28px;
   }
   
   #keyboard button {
-    height: 38px;
-    font-size: 12px;
-    border-radius: 4px;
-  }
-}
-
-/* Very small screens */
-@media (max-width: 360px) {
-  #keyboard {
-    padding: 0 2px;
-    gap: 4px;
-  }
-  
-  .kb-row {
-    gap: 1px;
-  }
-  
-  #keyboard button {
+    width: 8.5vw;
     height: 36px;
-    font-size: 11px;
-    min-width: 22px;
+    font-size: 12px;
+    max-width: 30px;
   }
 }
 
