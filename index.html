@@ -264,11 +264,11 @@
     }
     .two-player-choice button { margin: 0 8px; }
     .back-btn { background: #FFD700; color: #222; }
-    @media (max-width: 600px) {
+@media (max-width: 600px) {
   html, body {
     height: 100vh !important;
     min-height: 100vh !important;
-    overflow: hidden !important;
+    overflow-x: hidden !important;
     width: 100vw !important;
     min-width: 100vw !important;
     padding: 0 !important;
@@ -292,6 +292,25 @@
     box-sizing: border-box !important;
   }
 }
+    body.dark-mode {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+body.light-mode {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  color: #222;
+}
+.game-container.light-mode {
+  background: rgba(255,255,255,0.7);
+  color: #222;
+}
+  darkToggle.addEventListener('change',()=>{
+  document.body.classList.toggle('dark-mode',darkToggle.checked);
+  document.body.classList.toggle('light-mode',!darkToggle.checked);
+  document.querySelector('.game-container').classList.toggle('light-mode',!darkToggle.checked);
+  localStorage.setItem('theme',darkToggle.checked?'dark':'light');
+});
+    
   </style>
 </head>
 <body>
