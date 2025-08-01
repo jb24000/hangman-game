@@ -226,28 +226,24 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 10px;
   width: 100%;
   max-width: 100%;
-  margin-top: 10px;
   overflow-x: hidden;
 }
 
 .kb-row {
-  display: grid;
+  display: flex;
   justify-content: center;
-  margin: 2px 0;
+  width: 100%;
 }
 
-.kb-row.row1 { grid-template-columns: repeat(10, 1fr); }
-.kb-row.row2 { grid-template-columns: repeat(9, 1fr); }
-.kb-row.row3 { grid-template-columns: repeat(7, 1fr); }
-
 #keyboard button {
-  aspect-ratio: 1 / 1; /* keeps keys square */
-  min-width: 28px;
-  max-width: 40px;
-  margin: 1px;
-  font-size: clamp(10px, 3vw, 14px);
+  flex: 1;
+  max-width: 36px;
+  margin: 2px;
+  height: 40px;
+  font-size: 14px;
   font-weight: bold;
   border: none;
   border-radius: 5px;
@@ -260,6 +256,15 @@ body {
   background: #aaa;
   cursor: not-allowed;
 }
+
+@media (max-width: 480px) {
+  #keyboard button {
+    height: 36px;
+    font-size: 12px;
+    margin: 1px;
+  }
+}
+
 
 
     }
