@@ -174,26 +174,28 @@
   align-items: center;
   gap: 8px;
   margin-top: 10px;
-  max-width: 400px;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
   box-sizing: border-box;
   width: 100%;
-  overflow-x: auto;
+  overflow-x: hidden; /* prevent horizontal scroll */
+  padding: 0 5px;     /* small padding for spacing */
 }
 
 .kb-row {
   display: flex;
   justify-content: center;
   gap: 4px;
-  width: 100%;
-  box-sizing: border-box;
-  /* Remove flex-wrap: nowrap; */
+  flex-wrap: nowrap; /* keep letters in one line */
+  width: auto;
 }
 
 #keyboard button {
+  flex: 1 1 auto;      /* buttons share available space */
   min-width: 28px;
-  height: 35px;
+  max-width: 40px;     /* slightly larger for readability */
+  height: 36px;
   font-size: 14px;
   font-weight: bold;
   border: none;
@@ -201,31 +203,34 @@
   background: #4CAF50;
   color: white;
   cursor: pointer;
-  flex: 1 1 0; /* Allow buttons to shrink/grow */
-  max-width: 32px;
   box-sizing: border-box;
 }
-    #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
-  @media (max-width: 480px) {
+#keyboard button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
   #keyboard {
-    max-width: 100vw;
     gap: 6px;
-    padding-left: 0;
-    padding-right: 0;
+    padding: 0 2px;
   }
   .kb-row {
     gap: 2px;
-    width: auto;
+    justify-content: space-between; /* evenly distribute */
+    width: 100%;
   }
   #keyboard button {
-    width: 9vw;
-    max-width: 28px;
-    min-width: 18px;
-    height: 32px;
+    flex: 1;            /* each key shares equal width */
+    height: 34px;
     font-size: 12px;
-    margin: 1px;
+    min-width: unset;   /* remove strict min-width */
+    max-width: unset;   /* let flex handle sizing */
+    margin: 0;
   }
 }
+
     }
     @media (max-width: 360px) {
       #keyboard button { min-width: 22px; height: 30px; font-size: 11px; margin: 1px; }
