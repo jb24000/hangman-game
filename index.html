@@ -25,10 +25,12 @@
     }
     .game-container {
       border-radius: 15px;
-      padding: 20px;
-      width: 100%;
-      max-width: 420px;
-      margin: auto;
+      padding: 15px;
+      width: 95%;
+      max-width: 650px;
+      min-width: 320px;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(6px);
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
     .title { text-align: center; font-size: 28px; margin-bottom: 5px; }
@@ -65,21 +67,41 @@
       border: 2px solid rgba(255,255,255,0.2); max-width: 280px;
       text-shadow: 0 0 4px rgba(255,255,255,0.5);
     }
-    .word-display { display: flex; justify-content: center; gap: 10px; flex-wrap: nowrap; margin: 20px 0; }
-    .word-display span { font-size: 28px; font-weight: bold; min-width: 24px; text-align: center; position: relative; }
-    .word-display span::after { content: "_"; position: absolute; left: 0; right: 0; bottom: -6px; }
-    .input-section { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 15px 0; }
-    @media (min-width: 1200px) { .input-section { flex-direction: row; justify-content: center; } }
-    #keyboard { display: none; flex-direction: column; align-items: center; gap: 8px; margin-top: 15px; }
-    .kb-row { display: flex; justify-content: center; gap: 6px; }
-    #keyboard button {
-      width: 9vw; height: 9vw; max-width: 45px; max-height: 45px; font-size: 5vw;
-      border: none; border-radius: 5px; background: #4CAF50; color: white;
+    .word-display {
+      display: flex; justify-content: center; gap: 6px;
+      flex-wrap: nowrap; overflow: hidden; margin: 20px 0;
     }
-    #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
-    @media (max-width: 768px) {
+    .word-display span { font-size: clamp(20px, 6vw, 28px); font-weight: bold; min-width: 20px; text-align: center; position: relative; }
+    .word-display span::after { content: "_"; position: absolute; left: 0; right: 0; bottom: -6px; }
+    .input-section {
+      display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 15px 0;
+    }
+    @media (min-width: 768px) { .input-section { flex-direction: row; justify-content: center; } }
+    #keyboard {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .kb-row {
+      display: flex; justify-content: center; gap: 6px; width: 100%;
+    }
+    #keyboard button {
+      flex: 1;
+      max-width: 11%;
+      aspect-ratio: 1 / 1;
+      font-size: clamp(14px, 6vw, 22px);
+      border: none; border-radius: 8px;
+      background: #4CAF50; color: white; font-weight: bold;
+    }
+    #keyboard button:disabled { background: #999; }
+    @media (min-width: 768px) {
+      #keyboard { display: none; }
+      #guess-input, #guess-button { display: inline-block; }
+    }
+    @media (max-width: 767px) {
       #guess-input, #guess-button { display: none; }
-      #keyboard { display: flex; }
     }
     .tabs { display: flex; justify-content: center; margin-bottom: 10px; }
     .tab { flex: 1; padding: 8px; cursor: pointer; border-bottom: 3px solid transparent; text-align:center; }
@@ -175,200 +197,61 @@
   </div>
 
   <script>
-    // Default preferences
+    // Theme and Sound
     if (!localStorage.getItem('theme')) localStorage.setItem('theme','dark');
     if (!localStorage.getItem('sound')) localStorage.setItem('sound','off');
-
     const darkToggle=document.getElementById('darkModeToggle');
     const soundToggle=document.getElementById('soundToggle');
     darkToggle.checked=localStorage.getItem('theme')==='dark';
     soundToggle.checked=localStorage.getItem('sound')==='on';
     if(darkToggle.checked){document.body.classList.add('dark-mode');} else {document.body.classList.add('light-mode');}
     let soundEnabled=soundToggle.checked;
+    darkToggle.addEventListener('change',()=>{if(darkToggle.checked){document.body.classList.add('dark-mode');document.body.classList.remove('light-mode');localStorage.setItem('theme','dark');}else{document.body.classList.add('light-mode');document.body.classList.remove('dark-mode');localStorage.setItem('theme','light');}});
+    soundToggle.addEventListener('change',()=>{soundEnabled=soundToggle.checked;localStorage.setItem('sound',soundEnabled?'on':'off');});
 
-    darkToggle.addEventListener('change',()=>{
-      if(darkToggle.checked){
-        document.body.classList.add('dark-mode');document.body.classList.remove('light-mode');
-        localStorage.setItem('theme','dark');
-      } else {
-        document.body.classList.add('light-mode');document.body.classList.remove('dark-mode');
-        localStorage.setItem('theme','light');
-      }
-    });
-    soundToggle.addEventListener('change',()=>{
-      soundEnabled=soundToggle.checked;
-      localStorage.setItem('sound',soundEnabled?'on':'off');
-    });
-
-    // Sound system
+    // Sounds
     const sounds={correct:new Audio('correct.mp3'),wrong:new Audio('wrong.mp3'),win:new Audio('win.mp3'),lose:new Audio('lose.mp3')};
     Object.values(sounds).forEach(s=>s.load());
-    function playSound(type){
-      if(soundEnabled&&sounds[type]){
-        sounds[type].pause();sounds[type].currentTime=0;sounds[type].play().catch(()=>{});
-      }
-    }
+    function playSound(type){if(soundEnabled&&sounds[type]){sounds[type].pause();sounds[type].currentTime=0;sounds[type].play().catch(()=>{});}}
 
-    // Subtitle Helper
-    function showSubtitle(message,duration=4000){
-      const subtitle=document.getElementById('subtitle');
-      subtitle.textContent=message;
-      subtitle.classList.remove('hidden');
-      setTimeout(()=>subtitle.classList.add('hidden'),duration);
-    }
+    // Subtitle
+    function showSubtitle(message,duration=4000){const subtitle=document.getElementById('subtitle');subtitle.textContent=message;subtitle.classList.remove('hidden');setTimeout(()=>subtitle.classList.add('hidden'),duration);}
 
-    // Result Banner
-    function showResultBanner(message,isWin){
-      const banner=document.getElementById('result-banner');
-      banner.textContent=message;
-      banner.className=`result-banner show ${isWin?'win':'lose'}`;
-      setTimeout(()=>{
-        banner.classList.add('hide');
-        setTimeout(()=>{
-          banner.style.display='none';
-          banner.className='result-banner'; // reset
-        },600);
-      },4000);
-    }
+    // Banner
+    function showResultBanner(message,isWin){const banner=document.getElementById('result-banner');banner.textContent=message;banner.className=`result-banner show ${isWin?'win':'lose'}`;setTimeout(()=>{banner.classList.add('hide');setTimeout(()=>{banner.style.display='none';banner.className='result-banner';},600);},4000);}
 
-    // Player Name
-    function savePlayerName(){
-      const name=document.getElementById('player-name-input').value.trim();
-      if(name){
-        localStorage.setItem('playerName',name);
-        document.getElementById('player-name-display').textContent=name;
-        document.getElementById('name-prompt').style.display='none';
-        document.getElementById('welcome-section').style.display='block';
-      }
-    }
-    function changeName(){
-      localStorage.removeItem('playerName');
-      document.getElementById('name-prompt').style.display='block';
-      document.getElementById('welcome-section').style.display='none';
-    }
-    if(localStorage.getItem('playerName')){
-      document.getElementById('player-name-display').textContent=localStorage.getItem('playerName');
-      document.getElementById('name-prompt').style.display='none';
-      document.getElementById('welcome-section').style.display='block';
-    }
+    // Player
+    function savePlayerName(){const name=document.getElementById('player-name-input').value.trim();if(name){localStorage.setItem('playerName',name);document.getElementById('player-name-display').textContent=name;document.getElementById('name-prompt').style.display='none';document.getElementById('welcome-section').style.display='block';}}
+    function changeName(){localStorage.removeItem('playerName');document.getElementById('name-prompt').style.display='block';document.getElementById('welcome-section').style.display='none';}
+    if(localStorage.getItem('playerName')){document.getElementById('player-name-display').textContent=localStorage.getItem('playerName');document.getElementById('name-prompt').style.display='none';document.getElementById('welcome-section').style.display='block';}
 
     // Leaderboard
     const leaderboards={easy:[],medium:[],hard:[]};
     let currentTab='easy';
-    function switchTab(tab){
-      currentTab=tab;
-      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-      document.querySelector(`.tab:nth-child(${tab==='easy'?1:tab==='medium'?2:3})`).classList.add('active');
-      renderLeaderboard();
-    }
-    function renderLeaderboard(){
-      const list=document.getElementById('leaderboard-list');
-      list.innerHTML=leaderboards[currentTab].length
-        ? leaderboards[currentTab].map((e,i)=>`<li>${i+1}. ${e.name} — ${e.score}</li>`).join('')
-        : '<li>No scores yet</li>';
-    }
+    function switchTab(tab){currentTab=tab;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelector(`.tab:nth-child(${tab==='easy'?1:tab==='medium'?2:3})`).classList.add('active');renderLeaderboard();}
+    function renderLeaderboard(){const list=document.getElementById('leaderboard-list');list.innerHTML=leaderboards[currentTab].length?leaderboards[currentTab].map((e,i)=>`<li>${i+1}. ${e.name} — ${e.score}</li>`).join(''):'<li>No scores yet</li>'; }
     renderLeaderboard();
 
-    // Game Vars
-    const stages=[`  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n / \\  │\n      │\n═══════`,
-`  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n /    │\n      │\n═══════`,
-`  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n      │\n      │\n═══════`,
-`  ┌───┐\n  │   │\n  ○   │\n /│   │\n      │\n      │\n═══════`,
-`  ┌───┐\n  │   │\n  ○   │\n  │   │\n      │\n      │\n═══════`,
-`  ┌───┐\n  │   │\n  ○   │\n      │\n      │\n      │\n═══════`,
-`  ┌───┐\n  │   │\n      │\n      │\n      │\n      │\n═══════`];
+    // Game
+    const stages=[`  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n / \\  │\n      │\n═══════`,`  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n /    │\n      │\n═══════`,`  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n      │\n      │\n═══════`,`  ┌───┐\n  │   │\n  ○   │\n /│   │\n      │\n      │\n═══════`,`  ┌───┐\n  │   │\n  ○   │\n  │   │\n      │\n      │\n═══════`,`  ┌───┐\n  │   │\n  ○   │\n      │\n      │\n      │\n═══════`,`  ┌───┐\n  │   │\n      │\n      │\n      │\n      │\n═══════`];
     const words=['python','docker','lambda','market','serverless'];
     let currentWord='', guessedLetters=[], correctLetters=[], lives=6, score=0, streak=0, timeLeft=60, freeHintUsed=false, gameOver=false, timer;
 
-    function startSinglePlayer(){
-      difficulty=document.getElementById('difficulty').value;
-      currentWord=words[Math.floor(Math.random()*words.length)];
-      score=0;streak=0;freeHintUsed=false;gameOver=false;timeLeft=60;
-      document.getElementById('lobby').style.display='none';
-      document.getElementById('game-area').style.display='block';
-      showSubtitle("Guess the word before time runs out!",4000);
-      startGame();
-    }
+    function startSinglePlayer(){difficulty=document.getElementById('difficulty').value;currentWord=words[Math.floor(Math.random()*words.length)];score=0;streak=0;freeHintUsed=false;gameOver=false;timeLeft=60;document.getElementById('lobby').style.display='none';document.getElementById('game-area').style.display='block';showSubtitle("Guess the word before time runs out!",4000);startGame();}
 
-    function startGame(){
-      guessedLetters=[];correctLetters=[];lives=6;gameOver=false;
-      updateHUD();updateDisplay();createKeyboard();startTimer();
-    }
+    function startGame(){guessedLetters=[];correctLetters=[];lives=6;gameOver=false;updateHUD();updateDisplay();createKeyboard();startTimer();if(window.innerWidth<768){document.getElementById('keyboard').style.display='flex';}else{document.getElementById('keyboard').style.display='none';}}
 
-    function updateHUD(){
-      document.getElementById('hud-line').textContent=`Score: ${score} | Time: ${timeLeft} | Streak: ${streak}`;
-    }
+    function updateHUD(){document.getElementById('hud-line').textContent=`Score: ${score} | Time: ${timeLeft} | Streak: ${streak}`;}
+    function updateDisplay(){const wd=document.getElementById('word-display');wd.innerHTML='';for(let l of currentWord){const s=document.createElement('span');s.textContent=correctLetters.includes(l)?l.toUpperCase():'';wd.appendChild(s);}document.getElementById('lives-display').textContent=`❤️ ${lives}/6 LIVES LEFT`;document.getElementById('hangman-display').textContent=stages[lives];}
 
-    function updateDisplay(){
-      const wd=document.getElementById('word-display');wd.innerHTML='';
-      for(let l of currentWord){
-        const s=document.createElement('span');
-        s.textContent=correctLetters.includes(l)?l.toUpperCase():'';
-        wd.appendChild(s);
-      }
-      document.getElementById('lives-display').textContent=`❤️ ${lives}/6 LIVES LEFT`;
-      document.getElementById('hangman-display').textContent=stages[lives];
-    }
+    function makeGuess(letter=null){if(gameOver)return;const input=document.getElementById('guess-input');const guess=(letter||input.value).toLowerCase().trim();if(!guess||guess.length!==1||!/[a-z]/.test(guess)||guessedLetters.includes(guess)){input.value='';return;}guessedLetters.push(guess);if(currentWord.includes(guess)){correctLetters.push(guess);score+=5;playSound('correct');if(currentWord.split('').every(l=>correctLetters.includes(l))){playSound('win');streak++;if(timeLeft>0)score+=20;clearInterval(timer);timeLeft=60;showResultBanner(`🎉 YOU WON! The word was ${currentWord.toUpperCase()} 🎉`,true);setTimeout(()=>{currentWord=words[Math.floor(Math.random()*words.length)];startGame();},4000);}}else{lives--;playSound('wrong');if(lives===0){clearInterval(timer);gameOver=true;playSound('lose');showResultBanner(`💀 GAME OVER! The word was ${currentWord.toUpperCase()} 💀`,false);}}updateDisplay();input.value='';}
+    document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();makeGuess();}});
 
-    function makeGuess(letter=null){
-      if(gameOver)return;
-      const input=document.getElementById('guess-input');
-      const guess=(letter||input.value).toLowerCase().trim();
-      if(!guess||guess.length!==1||!/[a-z]/.test(guess)||guessedLetters.includes(guess)){input.value='';return;}
-      guessedLetters.push(guess);
-      if(currentWord.includes(guess)){
-        correctLetters.push(guess);score+=5;playSound('correct');
-        if(currentWord.split('').every(l=>correctLetters.includes(l))){
-          playSound('win');streak++;if(timeLeft>0)score+=20;
-          clearInterval(timer);timeLeft=60;
-          showResultBanner(`🎉 YOU WON! The word was ${currentWord.toUpperCase()} 🎉`,true);
-          setTimeout(()=>{currentWord=words[Math.floor(Math.random()*words.length)];startGame();},4000);
-        }
-      } else {
-        lives--;playSound('wrong');
-        if(lives===0){
-          clearInterval(timer);gameOver=true;playSound('lose');
-          showResultBanner(`💀 GAME OVER! The word was ${currentWord.toUpperCase()} 💀`,false);
-        }
-      }
-      updateDisplay();input.value='';
-    }
-    document.getElementById('guess-input').addEventListener('keydown',e=>{
-      if(e.key==='Enter'){e.preventDefault();makeGuess();}
-    });
+    function useHint(){if(gameOver)return;let hidden=currentWord.split('').filter(l=>!correctLetters.includes(l));if(hidden.length===0)return;const r=hidden[Math.floor(Math.random()*hidden.length)];correctLetters.push(r);guessedLetters.push(r);if(!freeHintUsed){freeHintUsed=true;}else{score-=5;}updateDisplay();}
 
-    function useHint(){
-      if(gameOver)return;
-      let hidden=currentWord.split('').filter(l=>!correctLetters.includes(l));
-      if(hidden.length===0)return;
-      const r=hidden[Math.floor(Math.random()*hidden.length)];
-      correctLetters.push(r);guessedLetters.push(r);
-      if(!freeHintUsed){freeHintUsed=true;}else{score-=5;}
-      updateDisplay();
-    }
+    function createKeyboard(){const kb=document.getElementById('keyboard');kb.innerHTML='';const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];rows.forEach(r=>{const rowDiv=document.createElement('div');rowDiv.className='kb-row';r.split('').forEach(l=>{const b=document.createElement('button');b.textContent=l;b.onclick=()=>{b.disabled=true;makeGuess(l);};rowDiv.appendChild(b);});kb.appendChild(rowDiv);});}
 
-    function createKeyboard(){
-      const kb=document.getElementById('keyboard');kb.innerHTML='';
-      const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
-      rows.forEach(r=>{
-        const rowDiv=document.createElement('div');rowDiv.className='kb-row';
-        r.split('').forEach(l=>{
-          const b=document.createElement('button');b.textContent=l;
-          b.onclick=()=>{b.disabled=true;makeGuess(l);};rowDiv.appendChild(b);
-        });kb.appendChild(rowDiv);
-      });
-    }
-
-    function startTimer(){
-      clearInterval(timer);
-      timer=setInterval(()=>{
-        if(timeLeft>0){timeLeft--;updateHUD();}
-        else if(!gameOver){
-          clearInterval(timer);gameOver=true;playSound('lose');
-          showResultBanner(`💀 TIME UP! The word was ${currentWord.toUpperCase()} 💀`,false);
-        }
-      },1000);
-    }
+    function startTimer(){clearInterval(timer);timer=setInterval(()=>{if(timeLeft>0){timeLeft--;updateHUD();}else if(!gameOver){clearInterval(timer);gameOver=true;playSound('lose');showResultBanner(`💀 TIME UP! The word was ${currentWord.toUpperCase()} 💀`,false);}},1000);}
   </script>
 </body>
 </html>
