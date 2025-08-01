@@ -17,14 +17,6 @@
       justify-content: flex-start;
       padding: 0;
     }
-    .dark-mode {
-      background: linear-gradient(135deg, #222 0%, #333 100%) !important;
-      color: #fff !important;
-    }
-    .light-mode {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e0e0e0 100%) !important;
-      color: #222 !important;
-    }
     .game-container {
       background: rgba(0,0,0,0.3);
       border-radius: 15px;
@@ -34,17 +26,156 @@
       margin: 32px 0 0 0;
       box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     }
-    /* ... (keep your other styles unchanged) ... */
-    #keyboard {
+    .title {
+      text-align: center;
+      font-size: 28px;
+      color: #00ff88;
+      margin-bottom: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .subtitle {
+      text-align: center;
+      opacity: 0.8;
+      margin-bottom: 20px;
+      font-size: 15px;
+    }
+    .settings-label {
+      text-align: center;
+      font-size: 14px;
+      color: #ccc;
+      margin-bottom: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .toggles {
       display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 15px;
+    }
+    .switch { position:relative; display:inline-block; width:50px; height:24px; }
+    .switch input{display:none;}
+    .slider { position:absolute; top:0; left:0; right:0; bottom:0; background:#ccc; border-radius:34px; transition:.4s; }
+    .slider:before { content:""; position:absolute; width:18px; height:18px; left:3px; bottom:3px; background:white; border-radius:50%; transition:.4s; }
+    input:checked+.slider { background:#00ff88; }
+    input:checked+.slider:before { transform:translateX(26px); }
+    select, input[type=text] {
+      font-size: 16px;
+      padding: 7px;
+      border-radius: 8px;
+      border: none;
+      margin: 5px;
+      background: #f8f9fa;
+      color: #222;
+    }
+    button {
+      font-size: 16px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      background: #00ff88;
+      color: #333;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 8px 4px;
+      transition: background 0.2s;
+    }
+    button:hover { background: #00cc6a; }
+    .mode-button { margin: 10px 8px; padding: 12px 20px; font-size: 16px; }
+    .leaderboard {
+      text-align: center;
+      margin-top: 18px;
+    }
+    .leaderboard-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: white;
+      border-bottom: 2px solid #FFD700;
+      display: inline-block;
+      padding-bottom: 4px;
+      letter-spacing: 1px;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .tab {
+      padding: 6px 12px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      color: #fff;
+      font-weight: normal;
+      border-radius: 4px 4px 0 0;
+      background: none;
+      transition: color 0.2s;
+    }
+    .tab.active {
+      border-color: #FFD700;
+      font-weight: bold;
+      color: #FFD700;
+      background: rgba(255,255,255,0.05);
+    }
+    ul { list-style: none; padding: 0; margin: 0; }
+    li { margin: 5px 0; }
+    .score-timer {
+      text-align: center;
+      font-size: 17px;
+      font-weight: bold;
+      margin: 10px 0 0 0;
+    }
+    .high-score {
+      text-align: center;
+      font-size: 15px;
+      margin-top: 2px;
+      color: #FFD700;
+      font-weight: bold;
+    }
+    .hangman-display pre {
+      font-family: 'Courier New', monospace;
+      white-space: pre;
+      line-height: 1.0;
+      text-align: center;
+      font-size: 15px;
+      background: rgba(0,0,0,0.2);
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0 10px 0;
+    }
+    @media (max-width:480px){.hangman-display pre{font-size:12px;}}
+    .word-display {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+      margin: 20px 0 10px 0;
+    }
+    .word-display span {
+      font-size: 28px;
+      font-weight: bold;
+      min-width: 24px;
+      text-align: center;
+      border-bottom: 2px solid #00ff88;
+      margin: 0 2px;
+    }
+    .input-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0 0 0;
+    }
+    #keyboard {
+      display: none;
       flex-direction: column;
       align-items: center;
       gap: 8px;
       margin-top: 10px;
       width: 100%;
       max-width: 400px;
-      flex-wrap: wrap;
-      overflow-x: auto;
     }
     .kb-row {
       display: flex;
@@ -64,28 +195,75 @@
       color: white;
       cursor: pointer;
       flex: 0 0 auto;
-      margin-bottom: 2px;
     }
     #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
     @media (max-width: 480px) {
       #keyboard { max-width: 100%; gap: 6px; }
-      .kb-row { gap: 3px; }
-      #keyboard button { min-width: 24px; height: 32px; font-size: 12px; }
+      .kb-row { gap: 3px; flex-wrap: wrap; }
+      #keyboard button { min-width: 24px; height: 32px; font-size: 12px; margin: 1px; }
     }
     @media (max-width: 360px) {
-      #keyboard button { min-width: 22px; height: 30px; font-size: 11px; }
+      #keyboard button { min-width: 22px; height: 30px; font-size: 11px; margin: 1px; }
     }
-    /* Remove the media query that hides keyboard on desktop */
-    /* @media (max-width:1024px){ #guess-input,#guess-button{display:none;} #keyboard{display:flex;} } */
-    /* Instead, always show both input and keyboard */
-    .input-section {
+    @media (max-width:1024px){ #guess-input,#guess-button{display:none;} #keyboard{display:flex;} }
+    .guessed-letters {
+      text-align: center;
+      margin: 8px 0 0 0;
+      font-size: 16px;
+      color: #FFD700;
+      letter-spacing: 2px;
+      min-height: 22px;
+    }
+    .lives-display {
+      text-align: center;
+      font-size: 16px;
+      margin: 0 0 8px 0;
+      color: #ffb3b3;
+    }
+    .message {
+      text-align: center;
+      font-size: 17px;
+      margin: 10px 0 0 0;
+      min-height: 24px;
+      font-weight: bold;
+    }
+    .player-turn {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin: 10px 0;
+      color: #00ff88;
+    }
+    .fade-black {
+      position: fixed;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.95);
+      color: #FFD700;
+      z-index: 9999;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
-      margin: 10px 0 0 0;
+      justify-content: center;
+      font-size: 2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.7s;
     }
-    /* ... (rest of your styles unchanged) ... */
+    .fade-black.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .two-player-setup {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .two-player-setup input { margin: 5px; }
+    .two-player-choice {
+      text-align: center;
+      margin: 18px 0 0 0;
+    }
+    .two-player-choice button { margin: 0 8px; }
+    .back-btn { background: #FFD700; color: #222; }
   </style>
 </head>
 <body>
@@ -182,364 +360,343 @@
     </div>
   </div>
   <div class="fade-black" id="fade-black"></div>
-  <!-- Use public domain sound files -->
-  <audio id="audio-correct" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b7bfa.mp3"></audio>
-  <audio id="audio-wrong" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b7bfa.mp3"></audio>
-  <audio id="audio-win" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b7bfa.mp3"></audio>
-  <audio id="audio-lose" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b7bfa.mp3"></audio>
+  <audio id="audio-correct" src="correct.mp3"></audio>
+  <audio id="audio-wrong" src="wrong.mp3"></audio>
+  <audio id="audio-win" src="win.mp3"></audio>
+  <audio id="audio-lose" src="lose.mp3"></audio>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Theme + Sound defaults
-      if(!localStorage.getItem('theme')) localStorage.setItem('theme','dark');
-      if(!localStorage.getItem('sound')) localStorage.setItem('sound','off');
-      const darkToggle=document.getElementById('darkToggle');
-      const soundToggle=document.getElementById('soundToggle');
-      darkToggle.checked=localStorage.getItem('theme')==='dark';
-      soundToggle.checked=localStorage.getItem('sound')==='on';
-      document.body.classList.add(darkToggle.checked?'dark-mode':'light-mode');
-      let soundEnabled=soundToggle.checked;
-      darkToggle.addEventListener('change',()=>{document.body.classList.toggle('dark-mode',darkToggle.checked);document.body.classList.toggle('light-mode',!darkToggle.checked);localStorage.setItem('theme',darkToggle.checked?'dark':'light');});
-      soundToggle.addEventListener('change',()=>{soundEnabled=soundToggle.checked;localStorage.setItem('sound',soundEnabled?'on':'off');});
+    // Theme + Sound defaults
+    if(!localStorage.getItem('theme')) localStorage.setItem('theme','dark');
+    if(!localStorage.getItem('sound')) localStorage.setItem('sound','off');
+    const darkToggle=document.getElementById('darkToggle');
+    const soundToggle=document.getElementById('soundToggle');
+    darkToggle.checked=localStorage.getItem('theme')==='dark';
+    soundToggle.checked=localStorage.getItem('sound')==='on';
+    document.body.classList.add(darkToggle.checked?'dark-mode':'light-mode');
+    let soundEnabled=soundToggle.checked;
+    darkToggle.addEventListener('change',()=>{document.body.classList.toggle('dark-mode',darkToggle.checked);document.body.classList.toggle('light-mode',!darkToggle.checked);localStorage.setItem('theme',darkToggle.checked?'dark':'light');});
+    soundToggle.addEventListener('change',()=>{soundEnabled=soundToggle.checked;localStorage.setItem('sound',soundEnabled?'on':'off');});
 
-      // Sounds
-      function playSound(type){
-        if(!soundEnabled) return;
-        let el = document.getElementById('audio-'+type);
-        if(el) { el.currentTime=0; el.play().catch(()=>{}); }
-      }
+    // Sounds
+    function playSound(type){
+      if(!soundEnabled) return;
+      let el = document.getElementById('audio-'+type);
+      if(el) { el.currentTime=0; el.play().catch(()=>{}); }
+    }
 
-      // Hangman stages
-      const stages=[
-        `  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========`,
-        `  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========`,
-        `  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========`,
-        `  +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========`,
-        `  +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========`,
-        `  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========`,
-        `  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n=========`];
+    // Hangman stages
+    const stages=[
+      `  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========`,
+      `  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========`,
+      `  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========`,
+      `  +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========`,
+      `  +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========`,
+      `  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========`,
+      `  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n=========`];
 
-      // Word banks by difficulty
-      const wordBanks = {
-        easy: ['apple','banana','cherry','grape','lemon','melon','peach','pear','plum','kiwi'],
-        medium: ['computer','javascript','hangman','puzzle','challenge','victory','adventure','notebook','holiday','library'],
-        hard: ['xylophone','quizzical','mnemonic','juxtapose','zephyr','rhythm','syzygy','crypt','fjord','glyph']
-      };
+    // Word banks by difficulty
+    const wordBanks = {
+      easy: ['apple','banana','cherry','grape','lemon','melon','peach','pear','plum','kiwi'],
+      medium: ['computer','javascript','hangman','puzzle','challenge','victory','adventure','notebook','holiday','library'],
+      hard: ['xylophone','quizzical','mnemonic','juxtapose','zephyr','rhythm','syzygy','crypt','fjord','glyph']
+    };
 
-      // Game state
-      let currentWord='',guessedLetters=[],correctLetters=[],lives=6,score=0,streak=0,timeLeft=60,freeHintUsed=false,gameOver=false,timer;
-      let difficulty='medium',seriesLength=3,seriesWins=0,seriesLosses=0,seriesCount=0,highScore=0;
-      let twoPlayerMode = false, twoPlayerType = '', player1Name = '', player2Name = '', currentPlayer = 1, player1Score = 0, player2Score = 0, customWord = '';
+    // Game state
+    let currentWord='',guessedLetters=[],correctLetters=[],lives=6,score=0,streak=0,timeLeft=60,freeHintUsed=false,gameOver=false,timer;
+    let difficulty='medium',seriesLength=3,seriesWins=0,seriesLosses=0,seriesCount=0,highScore=0;
+    let twoPlayerMode = false, twoPlayerType = '', player1Name = '', player2Name = '', currentPlayer = 1, player1Score = 0, player2Score = 0, customWord = '';
 
-      // Leaderboard persistence
-      let leaderboards=JSON.parse(localStorage.getItem('leaderboards'))||{easy:[],medium:[],hard:[]};
-      let currentTab='medium';
-      function switchTab(tab){
-        currentTab=tab;
-        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-        document.querySelector(`.tab:nth-child(${tab==='easy'?1:tab==='medium'?2:3})`).classList.add('active');
-        renderLeaderboard();
-      }
-      function renderLeaderboard(){
-        const list=document.getElementById('leaderboard-list');
-        let arr = leaderboards[currentTab]||[];
-        list.innerHTML=arr.length?arr.slice(0,5).map((e,i)=>`<li>${i+1}. ${e.name} — ${e.score}</li>`).join(''):'<li>No scores yet</li>';
-      }
-      function saveLeaderboard(){
-        localStorage.setItem('leaderboards',JSON.stringify(leaderboards));
-      }
-      function addScore(name,score){
-        let arr = leaderboards[difficulty]||[];
-        arr.push({name,score});
-        arr = arr.sort((a,b)=>b.score-a.score).slice(0,5);
-        leaderboards[difficulty]=arr;
-        saveLeaderboard();
-        renderLeaderboard();
-      }
+    // Leaderboard persistence
+    let leaderboards=JSON.parse(localStorage.getItem('leaderboards'))||{easy:[],medium:[],hard:[]};
+    let currentTab='medium';
+    function switchTab(tab){
+      currentTab=tab;
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelector(`.tab:nth-child(${tab==='easy'?1:tab==='medium'?2:3})`).classList.add('active');
       renderLeaderboard();
+    }
+    function renderLeaderboard(){
+      const list=document.getElementById('leaderboard-list');
+      let arr = leaderboards[currentTab]||[];
+      list.innerHTML=arr.length?arr.slice(0,5).map((e,i)=>`<li>${i+1}. ${e.name} — ${e.score}</li>`).join(''):'<li>No scores yet</li>';
+    }
+    function saveLeaderboard(){
+      localStorage.setItem('leaderboards',JSON.stringify(leaderboards));
+    }
+    function addScore(name,score){
+      let arr = leaderboards[difficulty]||[];
+      arr.push({name,score});
+      arr = arr.sort((a,b)=>b.score-a.score).slice(0,5);
+      leaderboards[difficulty]=arr;
+      saveLeaderboard();
+      renderLeaderboard();
+    }
+    renderLeaderboard();
 
-      // Player name functions
-      function savePlayerName() {
-        const nameInput = document.getElementById('player-name-input');
-        const name = nameInput.value.trim();
-        if (name) {
-          document.getElementById('player-name-display').textContent = name;
-          document.getElementById('name-prompt').style.display = 'none';
-          document.getElementById('welcome-section').style.display = 'block';
-        }
+    // Player name functions
+    function savePlayerName() {
+      const nameInput = document.getElementById('player-name-input');
+      const name = nameInput.value.trim();
+      if (name) {
+        document.getElementById('player-name-display').textContent = name;
+        document.getElementById('name-prompt').style.display = 'none';
+        document.getElementById('welcome-section').style.display = 'block';
       }
-      function changeName() {
-        document.getElementById('name-prompt').style.display = 'block';
-        document.getElementById('welcome-section').style.display = 'none';
-        document.getElementById('player-name-input').value = '';
-      }
+    }
+    function changeName() {
+      document.getElementById('name-prompt').style.display = 'block';
+      document.getElementById('welcome-section').style.display = 'none';
+      document.getElementById('player-name-input').value = '';
+    }
 
-      // Two player mode selection
-      function showTwoPlayerChoice() {
-        document.getElementById('two-player-choice').style.display = 'block';
+    // Two player mode selection
+    function showTwoPlayerChoice() {
+      document.getElementById('two-player-choice').style.display = 'block';
+    }
+    function hideTwoPlayerChoice() {
+      document.getElementById('two-player-choice').style.display = 'none';
+    }
+    function showTwoPlayerSetup(type) {
+      twoPlayerType = type;
+      document.getElementById('two-player-setup').style.display = 'block';
+      document.getElementById('two-player-choice').style.display = 'none';
+      document.getElementById('tp-setup-title').textContent = type === 'custom' ? 'Custom Word Mode' : 'Turn-Based Mode';
+      document.getElementById('custom-word-entry').style.display = type === 'custom' ? 'block' : 'none';
+    }
+    function hideTwoPlayerSetup() {
+      document.getElementById('two-player-setup').style.display = 'none';
+      document.getElementById('custom-word-entry').style.display = 'none';
+    }
+    function startTwoPlayer() {
+      player1Name = document.getElementById('player1-name').value.trim() || 'Player 1';
+      player2Name = document.getElementById('player2-name').value.trim() || 'Player 2';
+      twoPlayerMode = true;
+      currentPlayer = 1;
+      player1Score = 0;
+      player2Score = 0;
+      seriesCount = 0;
+      seriesLength = 1;
+      if(twoPlayerType === 'turn') {
+        seriesLength = parseInt(document.getElementById('series').value);
       }
-      function hideTwoPlayerChoice() {
-        document.getElementById('two-player-choice').style.display = 'none';
-      }
-      function showTwoPlayerSetup(type) {
-        twoPlayerType = type;
-        document.getElementById('two-player-setup').style.display = 'block';
-        document.getElementById('two-player-choice').style.display = 'none';
-        document.getElementById('tp-setup-title').textContent = type === 'custom' ? 'Custom Word Mode' : 'Turn-Based Mode';
-        document.getElementById('custom-word-entry').style.display = type === 'custom' ? 'block' : 'none';
-      }
-      function hideTwoPlayerSetup() {
-        document.getElementById('two-player-setup').style.display = 'none';
-        document.getElementById('custom-word-entry').style.display = 'none';
-      }
-      function startTwoPlayer() {
-        player1Name = document.getElementById('player1-name').value.trim() || 'Player 1';
-        player2Name = document.getElementById('player2-name').value.trim() || 'Player 2';
-        twoPlayerMode = true;
-        currentPlayer = 1;
-        player1Score = 0;
-        player2Score = 0;
-        seriesCount = 0;
-        seriesLength = 1;
-        if(twoPlayerType === 'turn') {
-          seriesLength = parseInt(document.getElementById('series').value);
+      if(twoPlayerType === 'custom') {
+        customWord = document.getElementById('custom-word').value.trim().toLowerCase();
+        if(!customWord.match(/^[a-z]{3,}$/)) {
+          alert('Please enter a valid word (letters only, at least 3 characters).');
+          return;
         }
-        if(twoPlayerType === 'custom') {
-          customWord = document.getElementById('custom-word').value.trim().toLowerCase();
-          if(!customWord.match(/^[a-z]{3,}$/)) {
-            alert('Please enter a valid word (letters only, at least 3 characters).');
-            return;
-          }
-        }
-        document.getElementById('lobby').style.display = 'none';
-        document.getElementById('game-area').style.display = 'block';
-        document.getElementById('player-turn').style.display = 'block';
-        newGame();
       }
+      document.getElementById('lobby').style.display = 'none';
+      document.getElementById('game-area').style.display = 'block';
+      document.getElementById('player-turn').style.display = 'block';
+      newGame();
+    }
 
-      // Subtitle persistence
-      if(localStorage.getItem('subtitleSeen')){document.getElementById('subtitle').style.display='none';}
-      function hideSubtitleForever(){const subtitle=document.getElementById('subtitle');subtitle.style.display='none';localStorage.setItem('subtitleSeen','true');}
+    // Subtitle persistence
+    if(localStorage.getItem('subtitleSeen')){document.getElementById('subtitle').style.display='none';}
+    function hideSubtitleForever(){const subtitle=document.getElementById('subtitle');subtitle.style.display='none';localStorage.setItem('subtitleSeen','true');}
 
-      // Game functions
-      function newGame(){
-        difficulty=document.getElementById('difficulty').value;
-        seriesLength=parseInt(document.getElementById('series').value);
-        guessedLetters=[];correctLetters=[];lives=6;gameOver=false;freeHintUsed=false;timeLeft=60;
-        document.getElementById('message').textContent='';
-        if(twoPlayerMode && twoPlayerType === 'custom') {
-          currentWord = customWord;
-        } else {
-          let bank = wordBanks[difficulty];
-          currentWord = bank[Math.floor(Math.random()*bank.length)];
-        }
-        updateHUD();updateDisplay();createKeyboard();startTimer();
+    // Game functions
+    function newGame(){
+      difficulty=document.getElementById('difficulty').value;
+      seriesLength=parseInt(document.getElementById('series').value);
+      guessedLetters=[];correctLetters=[];lives=6;gameOver=false;freeHintUsed=false;timeLeft=60;
+      document.getElementById('message').textContent='';
+      if(twoPlayerMode && twoPlayerType === 'custom') {
+        currentWord = customWord;
+      } else {
+        let bank = wordBanks[difficulty];
+        currentWord = bank[Math.floor(Math.random()*bank.length)];
       }
-      function updateHUD(){
-        // High score
-        highScore = parseInt(localStorage.getItem('highScore-'+difficulty)||'0');
-        document.getElementById('high-score-display').textContent = 'High Score: ' + highScore;
-        if(twoPlayerMode && twoPlayerType === 'turn') {
-          document.getElementById('hud-line').textContent=`${player1Name}: ${player1Score} | ${player2Name}: ${player2Score} | Time: ${timeLeft}`;
-          document.getElementById('player-turn').textContent = `${currentPlayer === 1 ? player1Name : player2Name}'s Turn`;
-        } else if(twoPlayerMode && twoPlayerType === 'custom') {
-          document.getElementById('hud-line').textContent=`${player2Name}'s Turn | Time: ${timeLeft}`;
-          document.getElementById('player-turn').textContent = '';
-        } else {
-          document.getElementById('hud-line').textContent=`Score: ${score} | Time: ${timeLeft} | Streak: ${streak} | Difficulty: ${difficulty.charAt(0).toUpperCase()+difficulty.slice(1)}`;
-          document.getElementById('player-turn').textContent = '';
-        }
+      updateHUD();updateDisplay();createKeyboard();startTimer();
+    }
+    function updateHUD(){
+      // High score
+      highScore = parseInt(localStorage.getItem('highScore-'+difficulty)||'0');
+      document.getElementById('high-score-display').textContent = 'High Score: ' + highScore;
+      if(twoPlayerMode && twoPlayerType === 'turn') {
+        document.getElementById('hud-line').textContent=`${player1Name}: ${player1Score} | ${player2Name}: ${player2Score} | Time: ${timeLeft}`;
+        document.getElementById('player-turn').textContent = `${currentPlayer === 1 ? player1Name : player2Name}'s Turn`;
+      } else if(twoPlayerMode && twoPlayerType === 'custom') {
+        document.getElementById('hud-line').textContent=`${player2Name}'s Turn | Time: ${timeLeft}`;
+        document.getElementById('player-turn').textContent = '';
+      } else {
+        document.getElementById('hud-line').textContent=`Score: ${score} | Time: ${timeLeft} | Streak: ${streak}`;
+        document.getElementById('player-turn').textContent = '';
       }
-      function updateDisplay(){
-        const wd=document.getElementById('word-display');wd.innerHTML='';
-        for(let l of currentWord){const s=document.createElement('span');if(correctLetters.includes(l)){s.textContent=l.toUpperCase();}else{s.textContent='_';}wd.appendChild(s);}
-        document.getElementById('lives-display').textContent=`❤️ ${lives}/6 LIVES LEFT`;
-        // Hangman stage
-        const stageIndex = 6 - lives;
-        const stage = stages[stageIndex] || stages[stages.length-1];
-        document.getElementById('hangman-display').innerHTML=`<pre>${stage}</pre>`;
-        // Guessed letters
-        document.getElementById('guessed-letters').textContent = guessedLetters.length ? 'Guessed: ' + guessedLetters.map(l=>l.toUpperCase()).join(' ') : '';
-      }
-      function makeGuess(letter=null){
-        if(gameOver)return;
-        const input=document.getElementById('guess-input');
-        const guess=(letter||input.value).toLowerCase().trim();
-        if(!guess||guess.length!==1||!/[a-z]/.test(guess)||guessedLetters.includes(guess)){input.value='';return;}
-        guessedLetters.push(guess);
-        if(currentWord.includes(guess)){
-          correctLetters.push(guess);playSound('correct');
-          if(currentWord.split('').every(l=>correctLetters.includes(l))){
-            playSound('win');
-            if(twoPlayerMode && twoPlayerType === 'turn') {
-              if(currentPlayer === 1) player1Score += 10;
-              else player2Score += 10;
-              showFade(`${currentPlayer === 1 ? player1Name : player2Name} WON!<br>Word: ${currentWord.toUpperCase()}`);
-              setTimeout(() => {
-                currentPlayer = currentPlayer === 1 ? 2 : 1;
-                seriesCount++;
-                if(seriesCount < seriesLength) newGame();
-                else endTwoPlayerTurn();
-              }, 2000);
-            } else if(twoPlayerMode && twoPlayerType === 'custom') {
-              showFade(`${player2Name} WON!<br>Word: ${currentWord.toUpperCase()}`);
-              setTimeout(() => { backToLobby(); }, 2000);
-            } else {
-              streak++;score+=10;
-              if(score > highScore) { highScore = score; localStorage.setItem('highScore-'+difficulty, highScore); }
-              showFade(`🎉 You WON!<br>Word: ${currentWord.toUpperCase()}`);
-              addScore(document.getElementById('player-name-display').textContent||"Player",score);
-              setTimeout(() => { newGame(); }, 2000);
-            }
-            gameOver=true;
-          }
-        } else {
-          lives--;playSound('wrong');
-          if(lives===0){
-            playSound('lose');
-            if(twoPlayerMode && twoPlayerType === 'turn') {
-              showFade(`${currentPlayer === 1 ? player1Name : player2Name} LOST!<br>Word: ${currentWord.toUpperCase()}`);
-              setTimeout(() => {
-                currentPlayer = currentPlayer === 1 ? 2 : 1;
-                seriesCount++;
-                if(seriesCount < seriesLength) newGame();
-                else endTwoPlayerTurn();
-              }, 2000);
-            } else if(twoPlayerMode && twoPlayerType === 'custom') {
-              showFade(`${player2Name} LOST!<br>Word: ${currentWord.toUpperCase()}`);
-              setTimeout(() => { backToLobby(); }, 2000);
-            } else {
-              showFade(`💀 Game Over!<br>Word: ${currentWord.toUpperCase()}`);
-              addScore(document.getElementById('player-name-display').textContent||"Player",score);
-              setTimeout(() => { newGame(); }, 2000);
-            }
-            gameOver=true;
-          }
-        }
-        updateDisplay();updateHUD();input.value='';
-      }
-      document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();makeGuess();}});
-      function useHint(){
-        if(gameOver)return;
-        let hidden=currentWord.split('').filter(l=>!correctLetters.includes(l));
-        if(hidden.length===0)return;
-        const r=hidden[Math.floor(Math.random()*hidden.length)];
-        correctLetters.push(r);guessedLetters.push(r);
-        const messageEl=document.getElementById('message');
-        let penalty = 0;
-        if(!freeHintUsed){
-          freeHintUsed=true;
-          messageEl.textContent=`🆓 Free hint! The letter "${r.toUpperCase()}" was revealed.`;
-          messageEl.style.color="#00ff88";
-        } else {
-          if(difficulty==='easy') penalty=5;
-          else if(difficulty==='medium') penalty=7;
-          else penalty=15;
-          if(twoPlayerMode) {
-            messageEl.textContent=`💡 Hint used! The letter "${r.toUpperCase()}" was revealed.`;
+    }
+    function updateDisplay(){
+      const wd=document.getElementById('word-display');wd.innerHTML='';
+      for(let l of currentWord){const s=document.createElement('span');if(correctLetters.includes(l)){s.textContent=l.toUpperCase();}else{s.textContent='_';}wd.appendChild(s);}
+      document.getElementById('lives-display').textContent=`❤️ ${lives}/6 LIVES LEFT`;
+      // Hangman stage
+      const stageIndex = 6 - lives;
+      const stage = stages[stageIndex] || stages[stages.length-1];
+      document.getElementById('hangman-display').innerHTML=`<pre>${stage}</pre>`;
+      // Guessed letters
+      document.getElementById('guessed-letters').textContent = guessedLetters.length ? 'Guessed: ' + guessedLetters.map(l=>l.toUpperCase()).join(' ') : '';
+    }
+    function makeGuess(letter=null){
+      if(gameOver)return;
+      const input=document.getElementById('guess-input');
+      const guess=(letter||input.value).toLowerCase().trim();
+      if(!guess||guess.length!==1||!/[a-z]/.test(guess)||guessedLetters.includes(guess)){input.value='';return;}
+      guessedLetters.push(guess);
+      if(currentWord.includes(guess)){
+        correctLetters.push(guess);playSound('correct');
+        if(currentWord.split('').every(l=>correctLetters.includes(l))){
+          playSound('win');
+          if(twoPlayerMode && twoPlayerType === 'turn') {
+            if(currentPlayer === 1) player1Score += 10;
+            else player2Score += 10;
+            showFade(`${currentPlayer === 1 ? player1Name : player2Name} WON!<br>Word: ${currentWord.toUpperCase()}`);
+            setTimeout(() => {
+              currentPlayer = currentPlayer === 1 ? 2 : 1;
+              seriesCount++;
+              if(seriesCount < seriesLength) newGame();
+              else endTwoPlayerTurn();
+            }, 2000);
+          } else if(twoPlayerMode && twoPlayerType === 'custom') {
+            showFade(`${player2Name} WON!<br>Word: ${currentWord.toUpperCase()}`);
+            setTimeout(() => { backToLobby(); }, 2000);
           } else {
-            score-=penalty;if(score<0)score=0;
-            messageEl.textContent=`⚠️ Hint used! -${penalty} points. The letter "${r.toUpperCase()}" was revealed.`;
+            streak++;score+=10;
+            if(score > highScore) { highScore = score; localStorage.setItem('highScore-'+difficulty, highScore); }
+            showFade(`🎉 You WON!<br>Word: ${currentWord.toUpperCase()}`);
+            addScore(document.getElementById('player-name-display').textContent||"Player",score);
+            setTimeout(() => { newGame(); }, 2000);
           }
-          messageEl.style.color="#FFD700";
+          gameOver=true;
         }
-        updateDisplay();updateHUD();setTimeout(()=>{if(messageEl.textContent.includes("hint"))messageEl.textContent="";},3000);
-      }
-      function createKeyboard(){
-        const kb=document.getElementById('keyboard');
-        kb.innerHTML='';
-        const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
-        rows.forEach(r=>{
-          const rowDiv=document.createElement('div');
-          rowDiv.className='kb-row';
-          r.split('').forEach(l=>{
-            const b=document.createElement('button');
-            b.textContent=l;
-            b.disabled=guessedLetters.includes(l.toLowerCase());
-            b.onclick=()=>{b.disabled=true;makeGuess(l);};
-            rowDiv.appendChild(b);
-          });
-          kb.appendChild(rowDiv);
-        });
-      }
-      function startTimer(){
-        clearInterval(timer);
-        timer=setInterval(()=>{
-          if(timeLeft>0){
-            timeLeft--;
-            updateHUD();
-          } else if(!gameOver){
-            clearInterval(timer);
-            gameOver=true;
-            playSound('lose');
-            if(twoPlayerMode && twoPlayerType === 'turn') {
-              showFade(`⏰ Time Up!<br>${currentPlayer === 1 ? player1Name : player2Name} loses!<br>Word: ${currentWord.toUpperCase()}`);
-              setTimeout(() => {
-                currentPlayer = currentPlayer === 1 ? 2 : 1;
-                seriesCount++;
-                if(seriesCount < seriesLength) newGame();
-                else endTwoPlayerTurn();
-              }, 2000);
-            } else if(twoPlayerMode && twoPlayerType === 'custom') {
-              showFade(`⏰ Time Up!<br>${player2Name} loses!<br>Word: ${currentWord.toUpperCase()}`);
-              setTimeout(() => { backToLobby(); }, 2000);
-            } else {
-              showFade(`💀 Time Up!<br>Word: ${currentWord.toUpperCase()}`);
-              setTimeout(() => { newGame(); }, 2000);
-            }
+      } else {
+        lives--;playSound('wrong');
+        if(lives===0){
+          playSound('lose');
+          if(twoPlayerMode && twoPlayerType === 'turn') {
+            showFade(`${currentPlayer === 1 ? player1Name : player2Name} LOST!<br>Word: ${currentWord.toUpperCase()}`);
+            setTimeout(() => {
+              currentPlayer = currentPlayer === 1 ? 2 : 1;
+              seriesCount++;
+              if(seriesCount < seriesLength) newGame();
+              else endTwoPlayerTurn();
+            }, 2000);
+          } else if(twoPlayerMode && twoPlayerType === 'custom') {
+            showFade(`${player2Name} LOST!<br>Word: ${currentWord.toUpperCase()}`);
+            setTimeout(() => { backToLobby(); }, 2000);
+          } else {
+            showFade(`💀 Game Over!<br>Word: ${currentWord.toUpperCase()}`);
+            addScore(document.getElementById('player-name-display').textContent||"Player",score);
+            setTimeout(() => { newGame(); }, 2000);
           }
-        },1000);
+          gameOver=true;
+        }
       }
-      function showFade(msg) {
-        const fade = document.getElementById('fade-black');
-        fade.innerHTML = msg;
-        fade.classList.add('show');
-        setTimeout(()=>{fade.classList.remove('show');}, 1500);
+      updateDisplay();updateHUD();input.value='';
+    }
+    document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();makeGuess();}});
+    function useHint(){
+      if(gameOver)return;
+      let hidden=currentWord.split('').filter(l=>!correctLetters.includes(l));
+      if(hidden.length===0)return;
+      const r=hidden[Math.floor(Math.random()*hidden.length)];
+      correctLetters.push(r);guessedLetters.push(r);
+      const messageEl=document.getElementById('message');
+      let penalty = 0;
+      if(!freeHintUsed){
+        freeHintUsed=true;
+        messageEl.textContent=`🆓 Free hint! The letter "${r.toUpperCase()}" was revealed.`;
+        messageEl.style.color="#00ff88";
+      } else {
+        if(difficulty==='easy') penalty=5;
+        else if(difficulty==='medium') penalty=7;
+        else penalty=15;
+        if(twoPlayerMode) {
+          messageEl.textContent=`💡 Hint used! The letter "${r.toUpperCase()}" was revealed.`;
+        } else {
+          score-=penalty;if(score<0)score=0;
+          messageEl.textContent=`⚠️ Hint used! -${penalty} points. The letter "${r.toUpperCase()}" was revealed.`;
+        }
+        messageEl.style.color="#FFD700";
       }
-      function startSinglePlayer(){
-        twoPlayerMode = false;
-        document.getElementById('player-turn').style.display = 'none';
-        if(!localStorage.getItem('subtitleSeen'))hideSubtitleForever();
-        document.getElementById('lobby').style.display='none';
-        document.getElementById('game-area').style.display='block';
-        score = 0; streak = 0; seriesCount = 0;
-        newGame();
-      }
-      function endTwoPlayerTurn() {
-        showFade('Series Complete!');
-        setTimeout(()=>{backToLobby();}, 2000);
-      }
-      function backToLobby() {
-        clearInterval(timer);
-        twoPlayerMode = false;
-        document.getElementById('game-area').style.display = 'none';
-        document.getElementById('lobby').style.display = 'block';
-        document.getElementById('two-player-setup').style.display = 'none';
-        document.getElementById('two-player-choice').style.display = 'none';
-      }
-
-      // --- NEW: Update HUD when difficulty changes ---
-      document.getElementById('difficulty').addEventListener('change', function() {
-        difficulty = this.value;
-        updateHUD();
+      updateDisplay();updateHUD();setTimeout(()=>{if(messageEl.textContent.includes("hint"))messageEl.textContent="";},3000);
+    }
+    function createKeyboard(){
+      const kb=document.getElementById('keyboard');
+      kb.innerHTML='';
+      const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
+      rows.forEach(r=>{
+        const rowDiv=document.createElement('div');
+        rowDiv.className='kb-row';
+        r.split('').forEach(l=>{
+          const b=document.createElement('button');
+          b.textContent=l;
+          b.disabled=guessedLetters.includes(l.toLowerCase());
+          b.onclick=()=>{b.disabled=true;makeGuess(l);};
+          rowDiv.appendChild(b);
+        });
+        kb.appendChild(rowDiv);
       });
+    }
+    function startTimer(){
+      clearInterval(timer);
+      timer=setInterval(()=>{
+        if(timeLeft>0){
+          timeLeft--;
+          updateHUD();
+        } else if(!gameOver){
+          clearInterval(timer);
+          gameOver=true;
+          playSound('lose');
+          if(twoPlayerMode && twoPlayerType === 'turn') {
+            showFade(`⏰ Time Up!<br>${currentPlayer === 1 ? player1Name : player2Name} loses!<br>Word: ${currentWord.toUpperCase()}`);
+            setTimeout(() => {
+              currentPlayer = currentPlayer === 1 ? 2 : 1;
+              seriesCount++;
+              if(seriesCount < seriesLength) newGame();
+              else endTwoPlayerTurn();
+            }, 2000);
+          } else if(twoPlayerMode && twoPlayerType === 'custom') {
+            showFade(`⏰ Time Up!<br>${player2Name} loses!<br>Word: ${currentWord.toUpperCase()}`);
+            setTimeout(() => { backToLobby(); }, 2000);
+          } else {
+            showFade(`💀 Time Up!<br>Word: ${currentWord.toUpperCase()}`);
+            setTimeout(() => { newGame(); }, 2000);
+          }
+        }
+      },1000);
+    }
+    function showFade(msg) {
+      const fade = document.getElementById('fade-black');
+      fade.innerHTML = msg;
+      fade.classList.add('show');
+      setTimeout(()=>{fade.classList.remove('show');}, 1500);
+    }
+    function startSinglePlayer(){
+      twoPlayerMode = false;
+      document.getElementById('player-turn').style.display = 'none';
+      if(!localStorage.getItem('subtitleSeen'))hideSubtitleForever();
+      document.getElementById('lobby').style.display='none';
+      document.getElementById('game-area').style.display='block';
+      score = 0; streak = 0; seriesCount = 0;
+      newGame();
+    }
+    function endTwoPlayerTurn() {
+      showFade('Series Complete!');
+      setTimeout(()=>{backToLobby();}, 2000);
+    }
+    function backToLobby() {
+      clearInterval(timer);
+      twoPlayerMode = false;
+      document.getElementById('game-area').style.display = 'none';
+      document.getElementById('lobby').style.display = 'block';
+      document.getElementById('two-player-setup').style.display = 'none';
+      document.getElementById('two-player-choice').style.display = 'none';
+    }
 
-      // --- NEW: Make keyboard always visible and responsive ---
-      // (Already handled by CSS and not hiding keyboard on desktop)
-
-      // Expose functions to global scope for HTML onclick
-      window.savePlayerName = savePlayerName;
-      window.changeName = changeName;
-      window.showTwoPlayerChoice = showTwoPlayerChoice;
-      window.hideTwoPlayerChoice = hideTwoPlayerChoice;
-      window.showTwoPlayerSetup = showTwoPlayerSetup;
-      window.hideTwoPlayerSetup = hideTwoPlayerSetup;
-      window.startTwoPlayer = startTwoPlayer;
-      window.switchTab = switchTab;
-      window.startSinglePlayer = startSinglePlayer;
-      window.newGame = newGame;
-      window.backToLobby = backToLobby;
-      window.makeGuess = makeGuess;
-      window.useHint = useHint;
+    // FIX 1: Update HUD when difficulty changes
+    document.getElementById('difficulty').addEventListener('change', function() {
+      difficulty = this.value;
+      updateHUD();
     });
   </script>
 </body>
