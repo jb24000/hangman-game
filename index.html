@@ -173,22 +173,22 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin-top: 10px;
-  margin-left: auto;
-  margin-right: auto;
-  width: fit-content;       /* shrink to fit content */
-  max-width: 100%;          /* don’t exceed screen width */
-  overflow-x: hidden;       /* prevent sideways scrolling */
+  margin: 10px auto 0;
+  padding: 0 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .kb-row {
   display: flex;
-  justify-content: center;  /* center row */
+  justify-content: center;
   gap: 4px;
+  width: 100%;
+  flex-wrap: nowrap;
 }
 
 #keyboard button {
-  width: 32px;              /* fixed compact size */
+  width: 32px;
   height: 40px;
   font-size: 14px;
   font-weight: bold;
@@ -197,7 +197,8 @@
   background: #4CAF50;
   color: white;
   cursor: pointer;
-  flex-shrink: 0;           /* prevent keys from shrinking */
+  flex-shrink: 1;
+  min-width: 28px;
 }
 
 #keyboard button:disabled {
@@ -205,20 +206,61 @@
   cursor: not-allowed;
 }
 
+/* Mobile optimizations */
 @media (max-width: 480px) {
   #keyboard {
-    width: 100%;            /* let keyboard span screen */
-    justify-content: center;
     padding: 0 5px;
+    gap: 6px;
   }
+  
   .kb-row {
     gap: 2px;
-    flex-wrap: wrap;        /* allow wrapping if needed */
+    justify-content: space-evenly;
   }
+  
+  /* First row (10 letters) */
+  .kb-row:first-child #keyboard button {
+    width: calc((100vw - 40px) / 10 - 2px);
+    max-width: 32px;
+    min-width: 24px;
+  }
+  
+  /* Second row (9 letters) */
+  .kb-row:nth-child(2) #keyboard button {
+    width: calc((100vw - 36px) / 9 - 2px);
+    max-width: 34px;
+    min-width: 26px;
+  }
+  
+  /* Third row (7 letters) */
+  .kb-row:nth-child(3) #keyboard button {
+    width: calc((100vw - 28px) / 7 - 2px);
+    max-width: 38px;
+    min-width: 28px;
+  }
+  
   #keyboard button {
-    width: 9vw;             /* scale with screen width */
-    height: 36px;
+    height: 38px;
     font-size: 12px;
+    border-radius: 4px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  #keyboard {
+    padding: 0 2px;
+    gap: 4px;
+  }
+  
+  .kb-row {
+    gap: 1px;
+  }
+  
+  #keyboard button {
+    height: 36px;
+    font-size: 11px;
+    min-width: 22px;
   }
 }
 
