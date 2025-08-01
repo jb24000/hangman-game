@@ -226,25 +226,25 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Added to vertically center */
-  margin: 10px auto; /* Changed to auto for horizontal centering */
-  width: 90vw; /* Use viewport width to ensure fit */
-  max-width: 400px; /* Reduced max-width for better mobile fit */
+  justify-content: center;
+  margin: 10px auto;
+  width: 90vw;
+  max-width: 360px; /* Adjusted for QWERTY layout */
   overflow-x: hidden;
-  box-sizing: border-box; /* Ensure padding/margins don't cause overflow */
+  box-sizing: border-box;
 }
 
 .kb-row {
   display: flex;
   justify-content: center;
   width: 100%;
-  flex-wrap: wrap; /* Allow buttons to wrap if needed */
+  flex-wrap: nowrap; /* Prevent wrapping to maintain QWERTY layout */
 }
 
 #keyboard button {
-  flex: 0 0 auto; /* Changed from flex: 1 to prevent over-stretching */
-  width: 32px; /* Slightly smaller width for better fit */
-  max-width: 10vw; /* Use viewport units for responsive scaling */
+  flex: 0 0 auto;
+  width: calc(100% / 11); /* Divide width by max keys in a row (10 for top row + margin) */
+  max-width: 34px;
   height: 40px;
   margin: 2px;
   font-size: 14px;
@@ -261,17 +261,36 @@ body {
   cursor: not-allowed;
 }
 
+.kb-row:nth-child(2) {
+  width: 90%; /* Slightly narrower for middle row (9 keys) */
+  margin: 0 auto; /* Center the row */
+}
+
+.kb-row:nth-child(3) {
+  width: 70%; /* Narrower for bottom row (7 keys) */
+  margin: 0 auto; /* Center the row */
+}
+
 @media (max-width: 480px) {
   #keyboard {
-    width: 95vw; /* Slightly wider for very small screens */
-    max-width: 320px; /* Adjusted for smaller devices */
+    width: 95vw;
+    max-width: 320px;
   }
 
   #keyboard button {
-    width: 28px; /* Smaller buttons for mobile */
+    width: calc(100% / 12); /* Slightly smaller for mobile */
+    max-width: 28px;
     height: 36px;
     font-size: 12px;
-    margin: 1.5px; /* Slightly larger margin for touch targets */
+    margin: 1.5px;
+  }
+
+  .kb-row:nth-child(2) {
+    width: 85%; /* Adjust for middle row on mobile */
+  }
+
+  .kb-row:nth-child(3) {
+    width: 65%; /* Adjust for bottom row on mobile */
   }
 }
 
