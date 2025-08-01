@@ -16,42 +16,64 @@
     body {
       font-family: 'Courier New', monospace;
       min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 20px;
+      margin: 0;
       transition: background 0.5s ease, color 0.5s ease;
     }
     .game-container {
-      border-radius: 15px; padding: 20px;
-      width: 100%; max-width: 420px; /* limit width so desktop matches mobile shape */
+      border-radius: 15px;
+      padding: 20px;
+      width: 100%;
+      max-width: 420px;
       margin: auto;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
       transition: background 0.5s ease, color 0.5s ease;
     }
     .title {
-      text-align: center; font-size: 28px;
+      text-align: center;
+      font-size: 28px;
       margin-bottom: 10px;
-      display:flex; justify-content: center;
-      gap:10px; align-items:center;
+      display:flex;
+      justify-content: center;
+      gap:10px;
+      align-items:center;
     }
-    .subtitle { text-align: center; opacity: 0.8; margin-bottom: 20px; transition: opacity 1s ease; }
+    .subtitle { text-align: center; opacity: 0.8; margin-bottom: 20px; }
     .settings-label { text-align: center; font-size: 14px; color: #ccc; margin-bottom: 10px; font-weight: bold; }
 
     select, input {
-      font-size: 18px; padding: 8px;
-      border-radius: 8px; border: none;
+      font-size: 18px;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
       margin: 5px;
     }
     button {
-      font-size: 18px; padding: 12px 20px;
-      border: none; border-radius: 8px;
-      background: #00ff88; color: #333;
-      font-weight: bold; cursor: pointer;
+      font-size: 18px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #00ff88;
+      color: #333;
+      font-weight: bold;
+      cursor: pointer;
       margin: 8px;
     }
     button:hover { background: #00cc6a; }
 
-    .score-timer { text-align: center; font-size: 18px; font-weight: bold; margin: 10px 0; display:flex; justify-content:center; align-items:center; gap:10px; }
+    .score-timer {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin: 10px 0;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+    }
     .high-score { text-align: center; font-size: 16px; margin-top: 5px; opacity: 0; }
 
     .hangman-display {
@@ -73,23 +95,32 @@
     }
 
     .word-display {
-      display: flex; justify-content: center;
-      gap: 10px; flex-wrap: nowrap;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: nowrap;
       margin: 20px 0;
     }
     .word-display span {
-      font-size: 28px; font-weight: bold;
-      min-width: 24px; text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      min-width: 24px;
+      text-align: center;
       position: relative;
     }
     .word-display span::after {
-      content: "_"; position: absolute;
-      left: 0; right: 0; bottom: -6px;
+      content: "_";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -6px;
     }
 
     .input-section {
-      display: flex; flex-direction: column;
-      align-items: center; gap: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
       margin: 15px 0;
     }
     @media (min-width: 1024px) {
@@ -104,10 +135,13 @@
     }
     .kb-row { display: contents; }
     #keyboard button {
-      min-width: 32px; min-height: 40px;
+      min-width: 32px;
+      min-height: 40px;
       font-size: 18px;
-      border: none; border-radius: 5px;
-      background: #4CAF50; color: white;
+      border: none;
+      border-radius: 5px;
+      background: #4CAF50;
+      color: white;
       cursor: pointer;
     }
     #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
@@ -116,6 +150,12 @@
       #guess-input, #guess-button { display: none; }
       #keyboard { display: grid; }
     }
+
+    .tabs { display: flex; justify-content: center; margin-bottom: 10px; }
+    .tab { flex: 1; padding: 8px; cursor: pointer; border-bottom: 3px solid transparent; text-align:center; }
+    .tab.active { border-color: #FFD700; font-weight: bold; color: #FFD700; }
+    ul { list-style: none; padding: 0; margin: 0; }
+    li { margin: 5px 0; text-align:center; }
   </style>
 </head>
 <body>
@@ -129,6 +169,18 @@
 
     <!-- Lobby -->
     <div id="lobby">
+      <div id="player-section">
+        <div id="name-prompt">
+          <p>Enter your name:</p>
+          <input type="text" id="player-name-input" placeholder="Your name">
+          <button onclick="savePlayerName()">Save</button>
+        </div>
+        <div id="welcome-section" style="display:none;">
+          Welcome, <span id="player-name-display"></span>
+          <button onclick="changeName()">Change</button>
+        </div>
+      </div>
+
       <div id="settings-container">
         Difficulty:
         <select id="difficulty">
@@ -136,8 +188,25 @@
           <option value="medium">Medium</option>
           <option value="hard">Hard</option>
         </select>
+        Series:
+        <select id="series">
+          <option value="1">Best of 1</option>
+          <option value="3" selected>Best of 3</option>
+          <option value="5">Best of 5</option>
+        </select>
       </div>
+
       <button onclick="startSinglePlayer()">Start Game</button>
+
+      <div class="leaderboard">
+        <div class="leaderboard-title">Leaderboard</div>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('easy')">Easy</div>
+          <div class="tab" onclick="switchTab('medium')">Medium</div>
+          <div class="tab" onclick="switchTab('hard')">Hard</div>
+        </div>
+        <ul id="leaderboard-list"></ul>
+      </div>
     </div>
 
     <!-- Game -->
@@ -162,13 +231,12 @@
   </div>
 
   <script>
-    // Default theme: dark
+    // ==== Dark Mode Default ====
     if (localStorage.getItem('theme') === 'light') {
       document.body.classList.add('light-mode');
     } else {
       document.body.classList.add('dark-mode');
     }
-
     function toggleTheme() {
       if (document.body.classList.contains('dark-mode')) {
         document.body.classList.replace('dark-mode','light-mode');
@@ -179,7 +247,7 @@
       }
     }
 
-    // Sound system
+    // ==== Sound ====
     const sounds = {
       correct: new Audio('correct.mp3'),
       wrong: new Audio('wrong.mp3'),
@@ -205,7 +273,45 @@
     }
     updateSoundButtons();
 
-    // Game variables
+    // ==== Player Name ====
+    function savePlayerName(){
+      const name=document.getElementById('player-name-input').value.trim();
+      if(name){
+        localStorage.setItem('playerName',name);
+        document.getElementById('player-name-display').textContent=name;
+        document.getElementById('name-prompt').style.display='none';
+        document.getElementById('welcome-section').style.display='block';
+      }
+    }
+    function changeName(){
+      localStorage.removeItem('playerName');
+      document.getElementById('name-prompt').style.display='block';
+      document.getElementById('welcome-section').style.display='none';
+    }
+    if(localStorage.getItem('playerName')){
+      document.getElementById('player-name-display').textContent=localStorage.getItem('playerName');
+      document.getElementById('name-prompt').style.display='none';
+      document.getElementById('welcome-section').style.display='block';
+    }
+
+    // ==== Leaderboard ====
+    const leaderboards={easy:[],medium:[],hard:[]};
+    let currentTab='easy';
+    function switchTab(tab){
+      currentTab=tab;
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelector(`.tab:nth-child(${tab==='easy'?1:tab==='medium'?2:3})`).classList.add('active');
+      renderLeaderboard();
+    }
+    function renderLeaderboard(){
+      const list=document.getElementById('leaderboard-list');
+      list.innerHTML=leaderboards[currentTab].length
+        ? leaderboards[currentTab].map((e,i)=>`<li>${i+1}. ${e.name} — ${e.score}</li>`).join('')
+        : '<li>No scores yet</li>';
+    }
+    renderLeaderboard();
+
+    // ==== Game Variables ====
     const stages=[`  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n / \\  │\n      │\n═══════`,
 `  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n /    │\n      │\n═══════`,
 `  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n      │\n      │\n═══════`,
@@ -217,6 +323,7 @@
     let currentWord='', guessedLetters=[], correctLetters=[], lives=6, score=0, streak=0, timeLeft=60, freeHintUsed=false, gameOver=false, timer;
 
     function startSinglePlayer(){
+      difficulty=document.getElementById('difficulty').value;
       currentWord=words[Math.floor(Math.random()*words.length)];
       score=0;streak=0;freeHintUsed=false;gameOver=false;timeLeft=60;
       document.getElementById('lobby').style.display='none';
@@ -253,11 +360,14 @@
       if(currentWord.includes(guess)){
         correctLetters.push(guess);score+=5;playSound('correct');
         if(currentWord.split('').every(l=>correctLetters.includes(l))){
-          playSound('win');streak++;currentWord=words[Math.floor(Math.random()*words.length)];startGame();
+          playSound('win');streak++;if(timeLeft>0)score+=20;
+          clearInterval(timer);timeLeft=60;
+          currentWord=words[Math.floor(Math.random()*words.length)];
+          startGame();
         }
       } else {
         lives--;playSound('wrong');
-        if(lives===0){gameOver=true;playSound('lose');alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nScore: ${score}`);location.reload();}
+        if(lives===0){clearInterval(timer);gameOver=true;playSound('lose');alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nScore: ${score}`);location.reload();}
       }
       updateDisplay();input.value='';
     }
@@ -291,7 +401,7 @@
       clearInterval(timer);
       timer=setInterval(()=>{
         if(timeLeft>0){timeLeft--;updateHUD();}
-        else if(!gameOver){gameOver=true;playSound('lose');alert(`💀 TIME UP! The word was ${currentWord.toUpperCase()}\nScore: ${score}`);location.reload();}
+        else if(!gameOver){clearInterval(timer);gameOver=true;playSound('lose');alert(`💀 TIME UP! The word was ${currentWord.toUpperCase()}\nScore: ${score}`);location.reload();}
       },1000);
     }
   </script>
