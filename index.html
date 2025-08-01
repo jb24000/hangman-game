@@ -169,33 +169,32 @@
       margin: 10px 0 0 0;
     }
 #keyboard {
-  display: none;
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   margin-top: 10px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 500px;  /* keeps it neat on desktop */
   margin-left: auto;
   margin-right: auto;
+  padding: 0 5px;
   box-sizing: border-box;
-  width: 100%;
-  overflow-x: hidden; /* prevent horizontal scroll */
-  padding: 0 5px;     /* small padding for spacing */
 }
 
 .kb-row {
   display: flex;
   justify-content: center;
   gap: 4px;
-  flex-wrap: nowrap; /* keep letters in one line */
-  width: auto;
+  width: 100%;
+  flex-wrap: nowrap;
 }
 
 #keyboard button {
-  flex: 1 1 auto;      /* buttons share available space */
-  min-width: 28px;
-  max-width: 40px;     /* slightly larger for readability */
-  height: 36px;
+  flex: 1;               /* equal width in each row */
+  max-width: 12%;        /* prevents keys from being too wide */
+  min-width: 30px;       /* ensures keys stay tappable */
+  height: 40px;
   font-size: 14px;
   font-weight: bold;
   border: none;
@@ -210,24 +209,19 @@
   cursor: not-allowed;
 }
 
-/* Mobile adjustments */
 @media (max-width: 480px) {
   #keyboard {
+    max-width: 100%;
     gap: 6px;
-    padding: 0 2px;
   }
   .kb-row {
-    gap: 2px;
-    justify-content: space-between; /* evenly distribute */
-    width: 100%;
+    gap: 3px;
   }
   #keyboard button {
-    flex: 1;            /* each key shares equal width */
-    height: 34px;
+    height: 36px;
     font-size: 12px;
-    min-width: unset;   /* remove strict min-width */
-    max-width: unset;   /* let flex handle sizing */
-    margin: 0;
+    max-width: none;   /* let buttons stretch fully */
+    flex: 1;           /* make sure they fill the row */
   }
 }
 
