@@ -16,15 +16,15 @@
     .game-container {
       background: rgba(0,0,0,0.3);
       border-radius: 15px; padding: 20px;
-      width: 100%; max-width: 600px;
+      width: 100%; max-width: 650px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     }
     .title { text-align: center; font-size: 28px; color: #00ff88; margin-bottom: 10px; }
     .subtitle { text-align: center; opacity: 0.8; margin-bottom: 20px; }
-    .card {
-      background: rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 15px; margin-bottom: 20px;
+    .settings-label {
+      text-align: center; font-size: 14px; color: #ccc;
+      margin-bottom: 10px; font-weight: bold; letter-spacing: 1px;
+      opacity: 0; transition: opacity 1s ease;
     }
     select, input {
       font-size: 18px; padding: 8px;
@@ -40,23 +40,45 @@
     }
     button:hover { background: #00cc6a; }
     .leaderboard { text-align: center; }
-    .tabs { display: flex; justify-content: center; margin-bottom: 10px; }
-    .tab {
-      flex: 1; padding: 8px; cursor: pointer;
-      border-bottom: 3px solid transparent;
+    .leaderboard-title {
+      text-align: center; font-size: 18px; font-weight: bold;
+      margin-bottom: 10px; color: white;
+      border-bottom: 2px solid #FFD700; display: inline-block; padding-bottom: 4px;
     }
+    .tabs { display: flex; justify-content: center; margin-bottom: 10px; }
+    .tab { flex: 1; padding: 8px; cursor: pointer; border-bottom: 3px solid transparent; }
     .tab.active { border-color: #FFD700; font-weight: bold; color: #FFD700; }
     ul { list-style: none; padding: 0; margin: 0; }
     li { margin: 5px 0; }
+
+    /* HUD/Game */
+    .score-timer { text-align: center; font-size: 18px; font-weight: bold; margin: 10px 0; }
+    .high-score { text-align: center; font-size: 16px; margin-top: 5px; opacity: 0; transition: opacity 1s ease; }
+    .hangman-display { font-family: 'Courier New', monospace; white-space: pre; text-align: center; margin: 20px 0; font-size: 14px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;}
+    .word-display { display: flex; justify-content: center; gap: 10px; flex-wrap: nowrap; margin: 20px 0; }
+    .word-display span { font-size: 28px; font-weight: bold; min-width: 24px; text-align: center; position: relative; }
+    .word-display span::after { content: "_"; position: absolute; left: 0; right: 0; bottom: -6px; color: white; }
+
+    @keyframes goldGlow {
+      0% { color: #FFD700; text-shadow: 0 0 5px #FFD700; }
+      50% { color: #fff8dc; text-shadow: 0 0 15px #FFD700; }
+      100% { color: #FFD700; text-shadow: 0 0 5px #FFD700; }
+    }
+    .glow { animation: goldGlow 1.5s ease-in-out; }
+
+    @media (max-width: 768px) {
+      #guess-input, #guess-button { display: none; }
+      #keyboard { display: flex; }
+    }
   </style>
 </head>
 <body>
   <div class="game-container">
     <div class="title">🎮 Hangman Game 🎮</div>
-    <div class="subtitle">A Professional Lobby Experience</div>
+    <div class="subtitle">Choose your settings to begin</div>
 
-    <!-- Lobby Card -->
-    <div id="lobby" class="card">
+    <!-- Lobby -->
+    <div id="lobby">
       <div id="player-section">
         <div id="name-prompt">
           <p>Enter your name to start playing:</p>
@@ -69,7 +91,7 @@
         </div>
       </div>
 
-      <div>
+      <div id="settings-container">
         Difficulty:
         <select id="difficulty">
           <option value="easy">Easy</option>
@@ -86,26 +108,37 @@
 
       <button onclick="startSinglePlayer()">Start Game</button>
       <button onclick="showTwoPlayerSetup()">2-Player Mode</button>
-    </div>
 
-    <!-- Leaderboard Card -->
-    <div class="card leaderboard">
-      <div class="tabs">
-        <div class="tab active" onclick="switchTab('easy')">Easy</div>
-        <div class="tab" onclick="switchTab('medium')">Medium</div>
-        <div class="tab" onclick="switchTab('hard')">Hard</div>
+      <div class="leaderboard">
+        <div class="leaderboard-title">Leaderboard</div>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('easy')">Easy</div>
+          <div class="tab" onclick="switchTab('medium')">Medium</div>
+          <div class="tab" onclick="switchTab('hard')">Hard</div>
+        </div>
+        <ul id="leaderboard-list"></ul>
       </div>
-      <ul id="leaderboard-list"></ul>
     </div>
 
-    <!-- Game Area Placeholder -->
+    <!-- Game -->
     <div id="game-area" style="display:none;">
-      <p>Game goes here (Phase 1 logic intact).</p>
+      <div class="score-timer">
+        <div id="hud-line">Score: 0 | Time: 60 | Streak: 0</div>
+        <div id="high-score-display" class="high-score"></div>
+      </div>
+      <div class="hangman-display" id="hangman-display"></div>
+      <div class="word-display" id="word-display"></div>
+      <div class="lives-display" id="lives-display"></div>
+      <div class="guessed-letters" id="guessed-letters"></div>
+      <input type="text" class="guess-input" id="guess-input" maxlength="1" placeholder="?">
+      <button id="guess-button" onclick="makeGuess()">Guess Letter</button>
+      <button onclick="useHint()">Get Hint</button>
+      <div id="keyboard"></div>
+      <div class="message" id="message"></div>
     </div>
   </div>
 
   <script>
-    // Load saved player name
     let playerName = localStorage.getItem('playerName');
     if (playerName) {
       document.getElementById('name-prompt').style.display = 'none';
@@ -113,7 +146,6 @@
       document.getElementById('player-name-display').textContent = playerName;
     }
 
-    // Save player name
     function savePlayerName() {
       const input = document.getElementById('player-name-input').value.trim();
       if (!input) return;
@@ -124,20 +156,14 @@
       playerName = input;
     }
 
-    // Change name
     function changeName() {
       localStorage.removeItem('playerName');
       document.getElementById('name-prompt').style.display = 'block';
       document.getElementById('welcome-section').style.display = 'none';
     }
 
-    // Leaderboard placeholder data
-    const leaderboards = {
-      easy: [{name:"Alex",score:320},{name:"Jamie",score:280}],
-      medium: [{name:"Sam",score:250}],
-      hard: [{name:"Jordan",score:200}]
-    };
-
+    // Placeholder leaderboard data
+    const leaderboards = { easy: [], medium: [], hard: [] };
     let currentTab = 'easy';
     function switchTab(tab) {
       currentTab = tab;
@@ -145,28 +171,17 @@
       document.querySelector(`.tab:nth-child(${tab==='easy'?1:tab==='medium'?2:3})`).classList.add('active');
       renderLeaderboard();
     }
-
     function renderLeaderboard() {
       const list = document.getElementById('leaderboard-list');
-      list.innerHTML = '';
-      const data = leaderboards[currentTab] || [];
-      if (data.length===0) {
-        list.innerHTML = '<li>No scores yet</li>';
-      } else {
-        data.forEach((entry,i)=>{
-          const li=document.createElement('li');
-          li.textContent=`${i+1}. ${entry.name} — ${entry.score}`;
-          list.appendChild(li);
-        });
-      }
+      list.innerHTML = leaderboards[currentTab].length
+        ? leaderboards[currentTab].map((e,i)=>`<li>${i+1}. ${e.name} — ${e.score}</li>`).join('')
+        : '<li>No scores yet</li>';
     }
+    renderLeaderboard();
+    document.getElementById('difficulty').addEventListener('change', e=>switchTab(e.target.value));
 
-    renderLeaderboard(); // initial render
-
-    // Sync dropdown with tabs
-    document.getElementById('difficulty').addEventListener('change', e=>{
-      switchTab(e.target.value);
-    });
+    // === Phase 1 Game Logic goes here ===
+    // (We’ll wire this in next)
   </script>
 </body>
 </html>
