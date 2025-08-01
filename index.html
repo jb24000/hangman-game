@@ -5,286 +5,168 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hangman Game</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Courier New', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-    .game-container { background: rgba(0, 0, 0, 0.3); border-radius: 15px; padding: 20px; width: 100%; max-width: 500px; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);}
-    .title { text-align: center; font-size: 24px; margin-bottom: 10px; color: #00ff88;}
-    .subtitle { text-align: center; margin-bottom: 20px; opacity: 0.8;}
-    .score-timer { text-align: center; font-size: 18px; font-weight: bold; margin: 10px 0; }
-    .high-score { text-align: center; font-size: 16px; margin-top: 5px; opacity: 0; transition: opacity 1s ease; }
-    .hangman-display { font-family: 'Courier New', monospace; white-space: pre; text-align: center; margin: 20px 0; font-size: 14px; background: rgba(0, 0, 0, 0.2); padding: 15px; border-radius: 10px;}
-    .word-display { display: flex; justify-content: center; gap: 10px; flex-wrap: nowrap; margin: 20px 0; }
-    .word-display span { font-size: 28px; font-weight: bold; min-width: 24px; text-align: center; position: relative; }
-    .word-display span::after { content: "_"; position: absolute; left: 0; right: 0; bottom: -6px; color: white; }
-    .guess-input, .custom-word-input, select { font-size: 20px; padding: 10px; border: none; border-radius: 8px; text-align: center; margin: 10px auto; width: 80%; display: block;}
-    .guess-button, .mode-button, .hint-button { font-size: 18px; padding: 12px; border: none; border-radius: 8px; background: #00ff88; color: #333; font-weight: bold; cursor: pointer; margin: 10px auto; display: block; width: 80%; }
-    .guess-button:hover, .mode-button:hover, .hint-button:hover { background: #00cc6a;}
-    #keyboard { display: none; flex-direction: column; align-items: center; gap: 10px; margin-top: 15px; width: 100%; }
-    .kb-row { display: flex; justify-content: center; gap: 5px; width: 100%; }
-    #keyboard button { flex: 1; aspect-ratio: 1/1; font-size: 5vw; border: none; border-radius: 5px; background: #4CAF50; color: white; cursor: pointer; }
-    #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
-
-    /* Overlay styles */
-    #result-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      z-index: 999;
-      text-align: center;
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 20px;
     }
-    #result-overlay .result-text { font-size: 28px; font-weight: bold; margin-bottom: 20px; }
-    #result-overlay.win .result-text { color: #00ff88; }
-    #result-overlay.lose .result-text { color: #ff6b6b; }
-    .new-high { color: #FFD700; font-weight: bold; margin-top: 15px; }
-
-    @keyframes goldGlow {
-      0% { color: #FFD700; text-shadow: 0 0 5px #FFD700; }
-      50% { color: #fff8dc; text-shadow: 0 0 15px #FFD700; }
-      100% { color: #FFD700; text-shadow: 0 0 5px #FFD700; }
+    .game-container {
+      background: rgba(0,0,0,0.3);
+      border-radius: 15px; padding: 20px;
+      width: 100%; max-width: 600px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     }
-    .glow { animation: goldGlow 1.5s ease-in-out; }
-
-    @media (max-width: 768px) {
-      #guess-input, #guess-button { display: none; }
-      #keyboard { display: flex; }
+    .title { text-align: center; font-size: 28px; color: #00ff88; margin-bottom: 10px; }
+    .subtitle { text-align: center; opacity: 0.8; margin-bottom: 20px; }
+    .card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 15px; margin-bottom: 20px;
     }
+    select, input {
+      font-size: 18px; padding: 8px;
+      border-radius: 8px; border: none;
+      margin: 5px;
+    }
+    button {
+      font-size: 18px; padding: 12px 20px;
+      border: none; border-radius: 8px;
+      background: #00ff88; color: #333;
+      font-weight: bold; cursor: pointer;
+      margin: 8px;
+    }
+    button:hover { background: #00cc6a; }
+    .leaderboard { text-align: center; }
+    .tabs { display: flex; justify-content: center; margin-bottom: 10px; }
+    .tab {
+      flex: 1; padding: 8px; cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    .tab.active { border-color: #FFD700; font-weight: bold; color: #FFD700; }
+    ul { list-style: none; padding: 0; margin: 0; }
+    li { margin: 5px 0; }
   </style>
 </head>
 <body>
   <div class="game-container">
     <div class="title">🎮 Hangman Game 🎮</div>
-    <div class="subtitle">Select Difficulty</div>
+    <div class="subtitle">A Professional Lobby Experience</div>
 
-    <label for="difficulty">Difficulty:</label>
-    <select id="difficulty">
-      <option value="easy">Easy</option>
-      <option value="medium">Medium</option>
-      <option value="hard">Hard</option>
-    </select>
-    <button class="mode-button" onclick="startSinglePlayer()">Start Game</button>
-    <button class="mode-button" onclick="showTwoPlayerSetup()">2-Player Mode</button>
-
-    <div id="two-player-setup" style="display:none; text-align:center;">
-      <p>Player 1: Enter a secret word</p>
-      <input type="password" class="custom-word-input" id="custom-word" placeholder="Secret word">
-      <button class="mode-button" onclick="startTwoPlayer()">Start Game</button>
-    </div>
-
-    <div id="game-area" style="display:none;">
-      <div class="score-timer">
-        <div id="hud-line">Score: 0 | Time: 60 | Streak: 0</div>
-        <div id="high-score-display" class="high-score"></div>
+    <!-- Lobby Card -->
+    <div id="lobby" class="card">
+      <div id="player-section">
+        <div id="name-prompt">
+          <p>Enter your name to start playing:</p>
+          <input type="text" id="player-name-input" placeholder="Your name">
+          <button onclick="savePlayerName()">Save</button>
+        </div>
+        <div id="welcome-section" style="display:none;">
+          Welcome, <span id="player-name-display"></span>
+          <button onclick="changeName()">Change</button>
+        </div>
       </div>
-      <div class="hangman-display" id="hangman-display"></div>
-      <div class="word-display" id="word-display"></div>
-      <div class="lives-display" id="lives-display"></div>
-      <div class="guessed-letters" id="guessed-letters"></div>
-      <input type="text" class="guess-input" id="guess-input" maxlength="1" placeholder="?">
-      <button class="guess-button" id="guess-button" onclick="makeGuess()">Guess Letter</button>
-      <button class="hint-button" onclick="useHint()">Get Hint</button>
-      <div id="keyboard"></div>
-      <div class="message" id="message"></div>
-    </div>
-  </div>
 
-  <!-- Result Overlay -->
-  <div id="result-overlay">
-    <div class="result-text" id="overlay-text"></div>
-    <div id="new-high-message"></div>
-    <button class="mode-button" onclick="newGame()">Play Again</button>
-    <button class="mode-button" onclick="changeDifficulty()">Change Difficulty</button>
+      <div>
+        Difficulty:
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        Series:
+        <select id="series">
+          <option value="1">Best of 1</option>
+          <option value="3" selected>Best of 3</option>
+          <option value="5">Best of 5</option>
+        </select>
+      </div>
+
+      <button onclick="startSinglePlayer()">Start Game</button>
+      <button onclick="showTwoPlayerSetup()">2-Player Mode</button>
+    </div>
+
+    <!-- Leaderboard Card -->
+    <div class="card leaderboard">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('easy')">Easy</div>
+        <div class="tab" onclick="switchTab('medium')">Medium</div>
+        <div class="tab" onclick="switchTab('hard')">Hard</div>
+      </div>
+      <ul id="leaderboard-list"></ul>
+    </div>
+
+    <!-- Game Area Placeholder -->
+    <div id="game-area" style="display:none;">
+      <p>Game goes here (Phase 1 logic intact).</p>
+    </div>
   </div>
 
   <script>
-    const words = ['animal','basket','button','castle','python','lambda','docker']; // demo, replace with full bank
-    const stages = [`  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n=========`,
-    `  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========`,
-    `  +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========`,
-    `  +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========`,
-    `  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========`,
-    `  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========`,
-    `  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========`];
-
-    let currentWord = '', guessedLetters = [], correctLetters = [], lives = 6, gameOver = false;
-    let twoPlayerMode = false, score = 0, difficulty = 'easy', freeHintUsed = false;
-    let timer, timeLeft = 60, streak = 0, highScoreShown = false, highScoreGlowed = false;
-
-    function loadDifficulty() {
-      const saved = localStorage.getItem('lastDifficulty');
-      if (saved) document.getElementById('difficulty').value = saved;
-    }
-    loadDifficulty();
-
-    function showTwoPlayerSetup() {
-      document.getElementById('two-player-setup').style.display = 'block';
+    // Load saved player name
+    let playerName = localStorage.getItem('playerName');
+    if (playerName) {
+      document.getElementById('name-prompt').style.display = 'none';
+      document.getElementById('welcome-section').style.display = 'block';
+      document.getElementById('player-name-display').textContent = playerName;
     }
 
-    function startSinglePlayer() {
-      twoPlayerMode = false;
-      difficulty = document.getElementById('difficulty').value;
-      localStorage.setItem('lastDifficulty', difficulty);
-      currentWord = selectWord(difficulty);
-      startGame();
+    // Save player name
+    function savePlayerName() {
+      const input = document.getElementById('player-name-input').value.trim();
+      if (!input) return;
+      localStorage.setItem('playerName', input);
+      document.getElementById('name-prompt').style.display = 'none';
+      document.getElementById('welcome-section').style.display = 'block';
+      document.getElementById('player-name-display').textContent = input;
+      playerName = input;
     }
 
-    function startTwoPlayer() {
-      const customWord = document.getElementById('custom-word').value.trim().toLowerCase();
-      if (!customWord.match(/^[a-z]+$/)) { alert("Please enter a valid word."); return; }
-      twoPlayerMode = true; currentWord = customWord; startGame();
+    // Change name
+    function changeName() {
+      localStorage.removeItem('playerName');
+      document.getElementById('name-prompt').style.display = 'block';
+      document.getElementById('welcome-section').style.display = 'none';
     }
 
-    function selectWord(level) {
-      let pool = words.filter(word => {
-        if (level === 'easy') return word.length <= 6;
-        if (level === 'medium') return word.length >= 7 && word.length <= 9;
-        return word.length >= 10 || word.length >= 6;
-      });
-      return pool[Math.floor(Math.random() * pool.length)];
+    // Leaderboard placeholder data
+    const leaderboards = {
+      easy: [{name:"Alex",score:320},{name:"Jamie",score:280}],
+      medium: [{name:"Sam",score:250}],
+      hard: [{name:"Jordan",score:200}]
+    };
+
+    let currentTab = 'easy';
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelector(`.tab:nth-child(${tab==='easy'?1:tab==='medium'?2:3})`).classList.add('active');
+      renderLeaderboard();
     }
 
-    function startGame() {
-      guessedLetters = []; correctLetters = []; lives = 6; gameOver = false;
-      freeHintUsed = false; timeLeft = 60;
-      document.getElementById('game-area').style.display = 'block';
-      document.getElementById('result-overlay').style.display = 'none';
-      highScoreShown = false; highScoreGlowed = false;
-      updateHUD(); updateDisplay(); createKeyboard(); startTimer();
-    }
-
-    function newGame() { startSinglePlayer(); }
-
-    function changeDifficulty() {
-      document.getElementById('game-area').style.display = 'none';
-      document.getElementById('result-overlay').style.display = 'none';
-    }
-
-    function updateHUD() {
-      document.getElementById('hud-line').textContent = `Score: ${score} | Time: ${timeLeft} | Streak: ${streak}`;
-      const hsKey = `highScore_${difficulty}`;
-      const highScore = localStorage.getItem(hsKey) || 0;
-      const hsDisplay = document.getElementById('high-score-display');
-      if (highScore > 0 || highScoreShown) {
-        hsDisplay.style.opacity = 1;
-        hsDisplay.textContent = `High Score (${difficulty}): ${highScore}`;
-      }
-    }
-
-    function updateDisplay() {
-      const wordDisplay = document.getElementById('word-display');
-      wordDisplay.innerHTML = '';
-      for (let letter of currentWord) {
-        const span = document.createElement('span');
-        span.textContent = correctLetters.includes(letter) ? letter.toUpperCase() : '';
-        wordDisplay.appendChild(span);
-      }
-      document.getElementById('lives-display').textContent = `❤️ ${lives}/6 LIVES LEFT`;
-      document.getElementById('hangman-display').textContent = stages[lives];
-      document.getElementById('guessed-letters').textContent = guessedLetters.length > 0 ? `Letters guessed: ${guessedLetters.sort().join(', ')}` : '';
-    }
-
-    function getPointsPerLetter() { return difficulty === 'easy' ? 3 : difficulty === 'medium' ? 5 : 10; }
-    function getHintPenalty() { return difficulty === 'easy' ? 5 : difficulty === 'medium' ? 7 : 15; }
-
-    function updateScore(points) {
-      score += points; updateHUD();
-      const hsKey = `highScore_${difficulty}`;
-      let highScore = parseInt(localStorage.getItem(hsKey) || 0);
-      if (score > highScore) {
-        localStorage.setItem(hsKey, score);
-        if (!highScoreGlowed) {
-          const hsDisplay = document.getElementById('high-score-display');
-          hsDisplay.classList.add('glow');
-          hsDisplay.textContent += " ✨";
-          setTimeout(() => hsDisplay.classList.remove('glow'), 1500);
-          highScoreGlowed = true;
-        }
-      }
-    }
-
-    function makeGuess(letterFromBtn = null) {
-      if (gameOver) return;
-      const input = document.getElementById('guess-input');
-      const guess = (letterFromBtn || input.value).toLowerCase().trim();
-      if (!guess || guess.length !== 1 || !/[a-z]/.test(guess) || guessedLetters.includes(guess)) { input.value=''; return; }
-      guessedLetters.push(guess);
-
-      if (currentWord.includes(guess)) {
-        correctLetters.push(guess);
-        updateScore(getPointsPerLetter());
-        if (currentWord.split('').every(l => correctLetters.includes(l))) {
-          streak++; if (timeLeft > 0) updateScore(20);
-          currentWord = selectWord(difficulty); startGame();
-        }
+    function renderLeaderboard() {
+      const list = document.getElementById('leaderboard-list');
+      list.innerHTML = '';
+      const data = leaderboards[currentTab] || [];
+      if (data.length===0) {
+        list.innerHTML = '<li>No scores yet</li>';
       } else {
-        lives--; if (lives === 0) { gameOver = true; showResult(false); }
-      }
-      updateDisplay(); input.value = '';
-    }
-
-    function useHint() {
-      if (gameOver) return;
-      let hiddenLetters = currentWord.split('').filter(l => !correctLetters.includes(l));
-      if (hiddenLetters.length === 0) return;
-      const randomLetter = hiddenLetters[Math.floor(Math.random() * hiddenLetters.length)];
-      correctLetters.push(randomLetter); guessedLetters.push(randomLetter);
-      if (!freeHintUsed) { freeHintUsed = true; } else { updateScore(-getHintPenalty()); }
-      updateScore(getPointsPerLetter());
-      if (currentWord.split('').every(l => correctLetters.includes(l))) {
-        streak++; if (timeLeft > 0) updateScore(20);
-        currentWord = selectWord(difficulty); startGame();
-      }
-      updateDisplay();
-    }
-
-    function createKeyboard() {
-      const kb = document.getElementById('keyboard'); kb.innerHTML = '';
-      const rows = ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
-      rows.forEach(r => {
-        const rowDiv = document.createElement('div'); rowDiv.className = 'kb-row';
-        r.split('').forEach(letter => {
-          const btn = document.createElement('button');
-          btn.textContent = letter;
-          btn.onclick = () => { btn.disabled = true; makeGuess(letter); };
-          rowDiv.appendChild(btn);
+        data.forEach((entry,i)=>{
+          const li=document.createElement('li');
+          li.textContent=`${i+1}. ${entry.name} — ${entry.score}`;
+          list.appendChild(li);
         });
-        kb.appendChild(rowDiv);
-      });
+      }
     }
 
-    function startTimer() {
-      clearInterval(timer);
-      timer = setInterval(() => {
-        if (timeLeft > 0) { timeLeft--; updateHUD(); }
-        else { clearInterval(timer); if (!gameOver) { gameOver = true; showResult(false); } }
-      }, 1000);
-    }
+    renderLeaderboard(); // initial render
 
-    function showResult(win) {
-      clearInterval(timer);
-      const overlay = document.getElementById('result-overlay');
-      const overlayText = document.getElementById('overlay-text');
-      const newHighMsg = document.getElementById('new-high-message');
-      const hsKey = `highScore_${difficulty}`;
-      const highScore = parseInt(localStorage.getItem(hsKey) || 0);
-      highScoreShown = true;
-
-      overlay.className = win ? 'win' : 'lose';
-      overlayText.textContent = win
-        ? `🎉 YOU WON! 🎉\nThe word was: ${currentWord.toUpperCase()}\nFinal Score: ${score}\nStreak: ${streak}`
-        : `💀 GAME OVER! 💀\nThe word was: ${currentWord.toUpperCase()}\nFinal Score: ${score}\nStreak: ${streak}\nHigh Score (${difficulty}): ${highScore}`;
-
-      if (score >= highScore) {
-        newHighMsg.innerHTML = `<div class="new-high">🎉 NEW HIGH SCORE! 🎉</div>`;
-      } else newHighMsg.innerHTML = '';
-      overlay.style.display = 'flex';
-    }
+    // Sync dropdown with tabs
+    document.getElementById('difficulty').addEventListener('change', e=>{
+      switchTab(e.target.value);
+    });
   </script>
 </body>
 </html>
-
