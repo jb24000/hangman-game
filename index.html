@@ -299,4 +299,57 @@
       if(gameOver)return;
       const input=document.getElementById('guess-input');
       const guess=(letter||input.value).toLowerCase().trim();
-      if(!guess||guess.length!==1||!/[a-z]()
+      if(!guess||guess.length!==1||!/[a-z]/.test(guess)||guessedLetters.includes(guess)){ input.value=''; return;}
+      guessedLetters.push(guess);
+      if(currentWord.includes(guess)){
+        correctLetters.push(guess); updateScore(getPointsPerLetter());
+        if(currentWord.split('').every(l=>correctLetters.includes(l))){
+          streak++; if(timeLeft>0)updateScore(20);
+          currentWord=selectWord(difficulty); startGame();
+        }
+      } else {
+        lives--; if(lives===0){ gameOver=true; alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nFinal Score: ${score}\nStreak: ${streak}`); location.reload();}
+      }
+      updateDisplay(); input.value='';
+    }
+
+    function useHint(){
+      if(gameOver)return;
+      let hidden=currentWord.split('').filter(l=>!correctLetters.includes(l));
+      if(hidden.length===0)return;
+      const r=hidden[Math.floor(Math.random()*hidden.length)];
+      correctLetters.push(r); guessedLetters.push(r);
+      if(!freeHintUsed){freeHintUsed=true;}else{updateScore(-getHintPenalty());}
+      updateScore(getPointsPerLetter());
+      if(currentWord.split('').every(l=>correctLetters.includes(l))){
+        streak++; if(timeLeft>0)updateScore(20);
+        currentWord=selectWord(difficulty); startGame();
+      }
+      updateDisplay();
+    }
+
+    function createKeyboard(){
+      const kb=document.getElementById('keyboard'); kb.innerHTML='';
+      const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
+      rows.forEach(r=>{
+        const rowDiv=document.createElement('div');
+        rowDiv.className='kb-row';
+        r.split('').forEach(l=>{
+          const b=document.createElement('button'); b.textContent=l;
+          b.onclick=()=>{b.disabled=true; makeGuess(l);}; 
+          rowDiv.appendChild(b);
+        });
+        kb.appendChild(rowDiv);
+      });
+    }
+
+    function startTimer(){
+      clearInterval(timer);
+      timer=setInterval(()=>{
+        if(timeLeft>0){timeLeft--;updateHUD();}
+        else{clearInterval(timer);if(!gameOver){gameOver=true;alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nFinal Score: ${score}\nStreak: ${streak}`);location.reload();}}
+      },1000);
+    }
+  </script>
+</body>
+</html>
