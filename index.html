@@ -59,6 +59,35 @@
     .word-display span { font-size: 28px; font-weight: bold; min-width: 24px; text-align: center; position: relative; }
     .word-display span::after { content: "_"; position: absolute; left: 0; right: 0; bottom: -6px; color: white; }
 
+    #keyboard {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+      width: 100%;
+    }
+    .kb-row {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      width: 100%;
+    }
+    #keyboard button {
+      flex: 1;
+      aspect-ratio: 1/1;
+      font-size: 5vw;
+      border: none;
+      border-radius: 5px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    #keyboard button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
     @keyframes goldGlow {
       0% { color: #FFD700; text-shadow: 0 0 5px #FFD700; }
       50% { color: #fff8dc; text-shadow: 0 0 15px #FFD700; }
@@ -270,54 +299,4 @@
       if(gameOver)return;
       const input=document.getElementById('guess-input');
       const guess=(letter||input.value).toLowerCase().trim();
-      if(!guess||guess.length!==1||!/[a-z]/.test(guess)||guessedLetters.includes(guess)){ input.value=''; return;}
-      guessedLetters.push(guess);
-      if(currentWord.includes(guess)){
-        correctLetters.push(guess); updateScore(getPointsPerLetter());
-        if(currentWord.split('').every(l=>correctLetters.includes(l))){
-          streak++; if(timeLeft>0)updateScore(20);
-          currentWord=selectWord(difficulty); startGame();
-        }
-      } else {
-        lives--; if(lives===0){ gameOver=true; alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nFinal Score: ${score}\nStreak: ${streak}`); location.reload();}
-      }
-      updateDisplay(); input.value='';
-    }
-
-    function useHint(){
-      if(gameOver)return;
-      let hidden=currentWord.split('').filter(l=>!correctLetters.includes(l));
-      if(hidden.length===0)return;
-      const r=hidden[Math.floor(Math.random()*hidden.length)];
-      correctLetters.push(r); guessedLetters.push(r);
-      if(!freeHintUsed){freeHintUsed=true;}else{updateScore(-getHintPenalty());}
-      updateScore(getPointsPerLetter());
-      if(currentWord.split('').every(l=>correctLetters.includes(l))){
-        streak++; if(timeLeft>0)updateScore(20);
-        currentWord=selectWord(difficulty); startGame();
-      }
-      updateDisplay();
-    }
-
-    function createKeyboard(){
-      const kb=document.getElementById('keyboard'); kb.innerHTML='';
-      ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'].forEach(r=>{
-        const d=document.createElement('div');
-        r.split('').forEach(l=>{
-          const b=document.createElement('button'); b.textContent=l;
-          b.onclick=()=>{b.disabled=true; makeGuess(l);}; d.appendChild(b);
-        });
-        kb.appendChild(d);
-      });
-    }
-
-    function startTimer(){
-      clearInterval(timer);
-      timer=setInterval(()=>{
-        if(timeLeft>0){timeLeft--;updateHUD();}
-        else{clearInterval(timer);if(!gameOver){gameOver=true;alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nFinal Score: ${score}\nStreak: ${streak}`);location.reload();}}
-      },1000);
-    }
-  </script>
-</body>
-</html>
+      if(!guess||guess.length!==1||!/[a-z]()
