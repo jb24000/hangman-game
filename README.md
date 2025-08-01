@@ -62,6 +62,14 @@ Expand this to 1000+ words for more variety!
 🐍 Original Python Version
 This project began as a simple console Python script:
 
++---+
+   |   |
+   O   |
+  /|\  |
+  / \  |
+       |
+ =========
+
 stages = [
     " +---+\n |   |\n     |\n     |\n     |\n     |\n=========",
     " +---+\n |   |\n O   |\n     |\n     |\n     |\n=========",
