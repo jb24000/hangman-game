@@ -226,23 +226,27 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 10px;
-  width: 100%;
-  max-width: 100%;
+  justify-content: center; /* Added to vertically center */
+  margin: 10px auto; /* Changed to auto for horizontal centering */
+  width: 90vw; /* Use viewport width to ensure fit */
+  max-width: 400px; /* Reduced max-width for better mobile fit */
   overflow-x: hidden;
+  box-sizing: border-box; /* Ensure padding/margins don't cause overflow */
 }
 
 .kb-row {
   display: flex;
   justify-content: center;
   width: 100%;
+  flex-wrap: wrap; /* Allow buttons to wrap if needed */
 }
 
 #keyboard button {
-  flex: 1;
-  max-width: 36px;
-  margin: 2px;
+  flex: 0 0 auto; /* Changed from flex: 1 to prevent over-stretching */
+  width: 32px; /* Slightly smaller width for better fit */
+  max-width: 10vw; /* Use viewport units for responsive scaling */
   height: 40px;
+  margin: 2px;
   font-size: 14px;
   font-weight: bold;
   border: none;
@@ -258,14 +262,18 @@ body {
 }
 
 @media (max-width: 480px) {
+  #keyboard {
+    width: 95vw; /* Slightly wider for very small screens */
+    max-width: 320px; /* Adjusted for smaller devices */
+  }
+
   #keyboard button {
+    width: 28px; /* Smaller buttons for mobile */
     height: 36px;
     font-size: 12px;
-    margin: 1px;
+    margin: 1.5px; /* Slightly larger margin for touch targets */
   }
 }
-
-
 
     }
     @media (max-width: 360px) {
