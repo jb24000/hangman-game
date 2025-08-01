@@ -229,10 +229,9 @@ body {
   justify-content: center;
   margin: 10px auto;
   width: 90vw;
-  max-width: 380px; /* Slightly increased for better QWERTY fit */
+  max-width: 380px; /* Base max-width for QWERTY layout */
   padding: 5px;
   box-sizing: border-box;
-  overflow-x: auto; /* Allow horizontal scroll if needed */
 }
 
 .kb-row {
@@ -240,14 +239,14 @@ body {
   justify-content: center;
   width: 100%;
   flex-wrap: nowrap; /* Maintain QWERTY layout */
-  min-width: 0; /* Prevent overflow issues */
+  min-width: 0; /* Prevent flexbox overflow */
 }
 
 #keyboard button {
   flex: 0 0 auto;
-  width: calc(100% / 10.5); /* Adjusted for top row (10 keys) with margins */
-  max-width: 36px; /* Increased slightly for better touch targets */
-  height: 42px;
+  width: calc(100% / 10 - 4px); /* 10 keys in top row, account for margins */
+  max-width: 35px; /* Adjusted for touch targets */
+  height: 40px;
   margin: 2px;
   font-size: 14px;
   font-weight: bold;
@@ -265,36 +264,59 @@ body {
 }
 
 .kb-row:nth-child(2) {
-  width: 95%; /* Slightly narrower for middle row (9 keys) */
+  width: 92%; /* Slightly narrower for middle row (9 keys) */
   margin: 0 auto;
 }
 
 .kb-row:nth-child(3) {
-  width: 80%; /* Adjusted for bottom row (7 keys) */
+  width: 75%; /* Narrower for bottom row (7 keys) */
   margin: 0 auto;
 }
 
 @media (max-width: 480px) {
   #keyboard {
     width: 95vw;
-    max-width: 340px; /* Adjusted for mobile */
+    max-width: 320px; /* Smaller max-width for mobile */
     padding: 3px;
   }
 
   #keyboard button {
-    width: calc(100% / 11); /* Adjusted for mobile */
+    width: calc(100% / 10 - 3px); /* Adjusted for mobile, 10 keys */
     max-width: 30px;
-    height: 38px;
+    height: 36px;
     font-size: 12px;
     margin: 1.5px;
   }
 
   .kb-row:nth-child(2) {
-    width: 90%; /* Adjust for middle row on mobile */
+    width: 88%; /* Adjusted for middle row on mobile */
   }
 
   .kb-row:nth-child(3) {
-    width: 75%; /* Adjust for bottom row on mobile */
+    width: 70%; /* Adjusted for bottom row on mobile */
+  }
+}
+
+@media (max-width: 360px) {
+  #keyboard {
+    width: 98vw;
+    max-width: 300px;
+  }
+
+  #keyboard button {
+    width: calc(100% / 10 - 2.5px);
+    max-width: 28px;
+    height: 34px;
+    font-size: 11px;
+    margin: 1px;
+  }
+
+  .kb-row:nth-child(2) {
+    width: 86%;
+  }
+
+  .kb-row:nth-child(3) {
+    width: 68%;
   }
 }
     }
