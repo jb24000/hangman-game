@@ -5,98 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hangman Game</title>
   <style>
+    /* Theme styles */
+    body.light-mode {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      color: #222;
+    }
+    body.light-mode .game-container { background: rgba(255,255,255,0.8); color: #222; }
+    body.dark-mode {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    body.dark-mode .game-container { background: rgba(0,0,0,0.3); color: white; }
+
     body {
       font-family: 'Courier New', monospace;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white; min-height: 100vh;
+      min-height: 100vh;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       padding: 20px;
+      transition: background 0.5s ease, color 0.5s ease;
     }
     .game-container {
-      background: rgba(0,0,0,0.3);
       border-radius: 15px; padding: 20px;
       width: 100%; max-width: 650px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      transition: background 0.5s ease, color 0.5s ease;
     }
-    .title { text-align: center; font-size: 28px; color: #00ff88; margin-bottom: 10px; }
+    .title { text-align: center; font-size: 28px; margin-bottom: 10px; display:flex; justify-content: center; gap:10px; align-items:center; }
     .subtitle { text-align: center; opacity: 0.8; margin-bottom: 20px; transition: opacity 1s ease; }
     .fade-out { opacity: 0; }
-    .settings-label {
-      text-align: center; font-size: 14px; color: #ccc;
-      margin-bottom: 10px; font-weight: bold; letter-spacing: 1px;
-      opacity: 0; transition: opacity 1s ease;
-    }
-    select, input {
-      font-size: 18px; padding: 8px;
-      border-radius: 8px; border: none;
-      margin: 5px;
-    }
+    .settings-label { text-align: center; font-size: 14px; color: #ccc; margin-bottom: 10px; font-weight: bold; opacity: 0; transition: opacity 1s ease; }
+
+    select, input { font-size: 18px; padding: 8px; border-radius: 8px; border: none; margin: 5px; }
     button {
-      font-size: 18px; padding: 12px 20px;
-      border: none; border-radius: 8px;
-      background: #00ff88; color: #333;
-      font-weight: bold; cursor: pointer;
-      margin: 8px;
+      font-size: 18px; padding: 12px 20px; border: none; border-radius: 8px;
+      background: #00ff88; color: #333; font-weight: bold; cursor: pointer;
+      margin: 8px; transition: background 0.3s ease;
     }
     button:hover { background: #00cc6a; }
-    .leaderboard { text-align: center; }
-    .leaderboard-title {
-      text-align: center; font-size: 18px; font-weight: bold;
-      margin-bottom: 10px; color: white;
-      border-bottom: 2px solid #FFD700; display: inline-block; padding-bottom: 4px;
-    }
-    .tabs { display: flex; justify-content: center; margin-bottom: 10px; }
-    .tab { flex: 1; padding: 8px; cursor: pointer; border-bottom: 3px solid transparent; }
-    .tab.active { border-color: #FFD700; font-weight: bold; color: #FFD700; }
-    ul { list-style: none; padding: 0; margin: 0; }
-    li { margin: 5px 0; }
 
-    .score-timer { text-align: center; font-size: 18px; font-weight: bold; margin: 10px 0; }
+    .score-timer { text-align: center; font-size: 18px; font-weight: bold; margin: 10px 0; display:flex; justify-content:center; align-items:center; gap:10px; }
     .high-score { text-align: center; font-size: 16px; margin-top: 5px; opacity: 0; transition: opacity 1s ease; }
     .hangman-display { font-family: 'Courier New', monospace; white-space: pre; text-align: center; margin: 20px 0; font-size: 14px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;}
     .word-display { display: flex; justify-content: center; gap: 10px; flex-wrap: nowrap; margin: 20px 0; }
     .word-display span { font-size: 28px; font-weight: bold; min-width: 24px; text-align: center; position: relative; }
-    .word-display span::after { content: "_"; position: absolute; left: 0; right: 0; bottom: -6px; color: white; }
+    .word-display span::after { content: "_"; position: absolute; left: 0; right: 0; bottom: -6px; }
 
-    .input-section { display: flex; justify-content: center; gap: 10px; margin: 15px 0; }
+    .input-section { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 15px 0; }
+    @media (min-width: 769px) { .input-section { flex-direction: row; justify-content: center; } }
 
-    #keyboard {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      margin-top: 15px;
-      width: 100%;
-    }
-    .kb-row {
-      display: flex;
-      justify-content: center;
-      gap: 5px;
-      width: 100%;
-    }
+    #keyboard { display: none; flex-direction: column; align-items: center; gap: 10px; margin-top: 15px; width: 100%; }
+    .kb-row { display: flex; justify-content: center; gap: 5px; width: 100%; }
     #keyboard button {
-      flex: 1;
-      aspect-ratio: 1/1;
-      font-size: 5vw;
-      border: none;
-      border-radius: 5px;
-      background: #4CAF50;
-      color: white;
-      cursor: pointer;
+      width: 9vw; height: 9vw; font-size: 5vw;
+      border: none; border-radius: 5px;
+      background: #4CAF50; color: white; cursor: pointer;
     }
-    #keyboard button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
-    }
-
-    @keyframes goldGlow {
-      0% { color: #FFD700; text-shadow: 0 0 5px #FFD700; }
-      50% { color: #fff8dc; text-shadow: 0 0 15px #FFD700; }
-      100% { color: #FFD700; text-shadow: 0 0 5px #FFD700; }
-    }
-    .glow { animation: goldGlow 1.5s ease-in-out; }
-
+    #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
     @media (max-width: 768px) {
       #guess-input, #guess-button { display: none; }
       #keyboard { display: flex; }
@@ -105,7 +70,11 @@
 </head>
 <body>
   <div class="game-container">
-    <div class="title">🎮 Hangman Game 🎮</div>
+    <div class="title">
+      🎮 Hangman Game 🎮
+      <button onclick="toggleTheme()">🌓</button>
+      <button class="sound-btn" onclick="toggleSound()">🔊</button>
+    </div>
     <div class="subtitle" id="subtitle">Choose your settings to begin</div>
 
     <!-- Lobby -->
@@ -138,24 +107,16 @@
       </div>
 
       <button onclick="startSinglePlayer()">Start Game</button>
-
-      <div class="leaderboard">
-        <div class="leaderboard-title">Leaderboard</div>
-        <div class="tabs">
-          <div class="tab active" onclick="switchTab('easy')">Easy</div>
-          <div class="tab" onclick="switchTab('medium')">Medium</div>
-          <div class="tab" onclick="switchTab('hard')">Hard</div>
-        </div>
-        <ul id="leaderboard-list"></ul>
-      </div>
     </div>
 
     <!-- Game -->
     <div id="game-area" style="display:none;">
       <div class="score-timer">
         <div id="hud-line">Score: 0 | Time: 60 | Streak: 0</div>
-        <div id="high-score-display" class="high-score"></div>
+        <button onclick="toggleTheme()">🌓</button>
+        <button class="sound-btn" onclick="toggleSound()">🔊</button>
       </div>
+      <div id="high-score-display" class="high-score"></div>
       <div class="hangman-display" id="hangman-display"></div>
       <div class="word-display" id="word-display"></div>
       <div class="lives-display" id="lives-display"></div>
@@ -171,48 +132,46 @@
   </div>
 
   <script>
-    // ==== Subtitle handling ====
-    if(localStorage.getItem('subtitleSeen')){
-      document.getElementById('subtitle').style.display='none';
-      const label=document.createElement('div');
-      label.textContent="SETTINGS";
-      label.className="settings-label";
-      document.querySelector('#lobby').insertBefore(label, document.getElementById('settings-container'));
-      setTimeout(()=>label.style.opacity=1,50);
-    }
-    function hideSubtitleForever(){
-      const subtitle=document.getElementById('subtitle');
-      subtitle.classList.add('fade-out');
-      setTimeout(()=>{
-        subtitle.style.display='none';
-        localStorage.setItem('subtitleSeen','true');
-        const label=document.createElement('div');
-        label.textContent="SETTINGS";
-        label.className="settings-label";
-        document.querySelector('#lobby').insertBefore(label, document.getElementById('settings-container'));
-        setTimeout(()=>label.style.opacity=1,50);
-      },1000);
+    // ==== Theme Toggle ====
+    if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+    else document.body.classList.add('light-mode');
+    function toggleTheme() {
+      if (document.body.classList.contains('dark-mode')) {
+        document.body.classList.replace('dark-mode','light-mode');
+        localStorage.setItem('theme','light');
+      } else {
+        document.body.classList.replace('light-mode','dark-mode');
+        localStorage.setItem('theme','dark');
+      }
     }
 
-    // ==== Leaderboard ====
-    const leaderboards={easy:[],medium:[],hard:[]};
-    let currentTab='easy';
-    function switchTab(tab){
-      currentTab=tab;
-      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-      document.querySelector(`.tab:nth-child(${tab==='easy'?1:tab==='medium'?2:3})`).classList.add('active');
-      renderLeaderboard();
+    // ==== Sound System ====
+    const sounds = {
+      correct: new Audio('correct.mp3'),
+      wrong: new Audio('wrong.mp3'),
+      win: new Audio('win.mp3'),
+      lose: new Audio('lose.mp3')
+    };
+    let soundEnabled = localStorage.getItem('sound') !== 'off';
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem('sound', soundEnabled ? 'on' : 'off');
+      updateSoundButtons();
     }
-    function renderLeaderboard(){
-      const list=document.getElementById('leaderboard-list');
-      list.innerHTML=leaderboards[currentTab].length
-        ? leaderboards[currentTab].map((e,i)=>`<li>${i+1}. ${e.name} — ${e.score}</li>`).join('')
-        : '<li>No scores yet</li>';
+    function updateSoundButtons() {
+      document.querySelectorAll('.sound-btn').forEach(btn=>{
+        btn.textContent = soundEnabled ? '🔊' : '🔇';
+      });
     }
-    renderLeaderboard();
-    document.getElementById('difficulty').addEventListener('change',e=>switchTab(e.target.value));
+    function playSound(type) {
+      if (soundEnabled && sounds[type]) {
+        sounds[type].currentTime = 0;
+        sounds[type].play();
+      }
+    }
+    updateSoundButtons();
 
-    // ==== Game Variables ====
+    // ==== Game Logic ====
     const words=['animal','basket','castle','python','docker','lambda','serverless','zebra','office','market'];
     const stages=[`  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n=========`,
 `  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========`,
@@ -221,16 +180,14 @@
 `  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========`,
 `  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========`,
 `  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========`];
-    let currentWord='',guessedLetters=[],correctLetters=[],lives=6,gameOver=false;
-    let score=0,difficulty='easy',streak=0,timeLeft=60,freeHintUsed=false,highScoreGlowed=false;
+    let currentWord='', guessedLetters=[], correctLetters=[], lives=6, gameOver=false;
+    let score=0, difficulty='easy', streak=0, timeLeft=60, freeHintUsed=false;
     let timer;
 
-    // ==== Start Game ====
     function startSinglePlayer(){
-      if(!localStorage.getItem('subtitleSeen')) hideSubtitleForever();
       difficulty=document.getElementById('difficulty').value;
       currentWord=selectWord(difficulty);
-      score=0;streak=0;freeHintUsed=false;highScoreGlowed=false;
+      score=0;streak=0;freeHintUsed=false;
       document.getElementById('lobby').style.display='none';
       document.getElementById('game-area').style.display='block';
       startGame();
@@ -250,13 +207,8 @@
       updateHUD();updateDisplay();createKeyboard();startTimer();
     }
 
-    // ==== HUD & Score ====
     function updateHUD(){
       document.getElementById('hud-line').textContent=`Score: ${score} | Time: ${timeLeft} | Streak: ${streak}`;
-      const hsKey=`highScore_${difficulty}`;
-      const highScore=localStorage.getItem(hsKey)||0;
-      const hsDisplay=document.getElementById('high-score-display');
-      if(highScore>0){hsDisplay.style.opacity=1;hsDisplay.textContent=`High Score (${difficulty}): ${highScore}`;}
     }
 
     function updateDisplay(){
@@ -268,29 +220,8 @@
       }
       document.getElementById('lives-display').textContent=`❤️ ${lives}/6 LIVES LEFT`;
       document.getElementById('hangman-display').textContent=stages[lives];
-      document.getElementById('guessed-letters').textContent=guessedLetters.length?`Letters guessed: ${guessedLetters.sort().join(', ')}`:'';
     }
 
-    function getPointsPerLetter(){return difficulty==='easy'?3:difficulty==='medium'?5:10;}
-    function getHintPenalty(){return difficulty==='easy'?5:difficulty==='medium'?7:15;}
-
-    function updateScore(p){
-      score+=p;updateHUD();
-      const hsKey=`highScore_${difficulty}`;
-      let highScore=parseInt(localStorage.getItem(hsKey)||0);
-      if(score>highScore){
-        localStorage.setItem(hsKey,score);
-        if(!highScoreGlowed){
-          const hsDisplay=document.getElementById('high-score-display');
-          hsDisplay.classList.add('glow');
-          hsDisplay.textContent+=" ✨";
-          setTimeout(()=>hsDisplay.classList.remove('glow'),1500);
-          highScoreGlowed=true;
-        }
-      }
-    }
-
-    // ==== Gameplay ====
     function makeGuess(letter=null){
       if(gameOver)return;
       const input=document.getElementById('guess-input');
@@ -298,18 +229,21 @@
       if(!guess||guess.length!==1||!/[a-z]/.test(guess)||guessedLetters.includes(guess)){input.value='';return;}
       guessedLetters.push(guess);
       if(currentWord.includes(guess)){
-        correctLetters.push(guess);updateScore(getPointsPerLetter());
+        correctLetters.push(guess);
+        playSound('correct');
+        score+=5;
         if(currentWord.split('').every(l=>correctLetters.includes(l))){
-          streak++;if(timeLeft>0)updateScore(20);
+          playSound('win');
+          streak++;
           currentWord=selectWord(difficulty);startGame();
         }
       } else {
-        lives--;if(lives===0){gameOver=true;alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nFinal Score: ${score}\nStreak: ${streak}`);location.reload();}
+        lives--; playSound('wrong');
+        if(lives===0){gameOver=true;playSound('lose');alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nFinal Score: ${score}`);location.reload();}
       }
       updateDisplay();input.value='';
     }
 
-    // Enter key support on desktop
     document.getElementById('guess-input').addEventListener('keydown',function(e){
       if(e.key==='Enter'){e.preventDefault();makeGuess();}
     });
@@ -320,12 +254,7 @@
       if(hidden.length===0)return;
       const r=hidden[Math.floor(Math.random()*hidden.length)];
       correctLetters.push(r);guessedLetters.push(r);
-      if(!freeHintUsed){freeHintUsed=true;}else{updateScore(-getHintPenalty());}
-      updateScore(getPointsPerLetter());
-      if(currentWord.split('').every(l=>correctLetters.includes(l))){
-        streak++;if(timeLeft>0)updateScore(20);
-        currentWord=selectWord(difficulty);startGame();
-      }
+      if(!freeHintUsed){freeHintUsed=true;}else{score-=5;}
       updateDisplay();
     }
 
@@ -345,7 +274,7 @@
       clearInterval(timer);
       timer=setInterval(()=>{
         if(timeLeft>0){timeLeft--;updateHUD();}
-        else{clearInterval(timer);if(!gameOver){gameOver=true;alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nFinal Score: ${score}\nStreak: ${streak}`);location.reload();}}
+        else{clearInterval(timer);if(!gameOver){gameOver=true;playSound('lose');alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nFinal Score: ${score}`);location.reload();}}
       },1000);
     }
   </script>
