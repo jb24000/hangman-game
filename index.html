@@ -59,6 +59,8 @@
     .word-display span { font-size: 28px; font-weight: bold; min-width: 24px; text-align: center; position: relative; }
     .word-display span::after { content: "_"; position: absolute; left: 0; right: 0; bottom: -6px; color: white; }
 
+    .input-section { display: flex; justify-content: center; gap: 10px; margin: 15px 0; }
+
     #keyboard {
       display: none;
       flex-direction: column;
@@ -104,7 +106,7 @@
 <body>
   <div class="game-container">
     <div class="title">🎮 Hangman Game 🎮</div>
-    <div class="subtitle">Choose your settings to begin</div>
+    <div class="subtitle" id="subtitle">Choose your settings to begin</div>
 
     <!-- Lobby -->
     <div id="lobby">
@@ -158,89 +160,77 @@
       <div class="word-display" id="word-display"></div>
       <div class="lives-display" id="lives-display"></div>
       <div class="guessed-letters" id="guessed-letters"></div>
-      <input type="text" id="guess-input" maxlength="1" placeholder="?">
-      <button id="guess-button" onclick="makeGuess()">Guess Letter</button>
-      <button onclick="useHint()">Get Hint</button>
+      <div class="input-section">
+        <input type="text" id="guess-input" maxlength="1" placeholder="?">
+        <button id="guess-button" onclick="makeGuess()">Guess Letter</button>
+        <button onclick="useHint()">Get Hint</button>
+      </div>
       <div id="keyboard"></div>
       <div class="message" id="message"></div>
     </div>
   </div>
 
   <script>
-    // Player name handling
-    let playerName = localStorage.getItem('playerName');
-    if (playerName) {
-      document.getElementById('name-prompt').style.display = 'none';
-      document.getElementById('welcome-section').style.display = 'block';
-      document.getElementById('player-name-display').textContent = playerName;
+    // ==== Subtitle handling ====
+    if(localStorage.getItem('subtitleSeen')){
+      document.getElementById('subtitle').style.display='none';
+      const label=document.createElement('div');
+      label.textContent="SETTINGS";
+      label.className="settings-label";
+      document.querySelector('#lobby').insertBefore(label, document.getElementById('settings-container'));
+      setTimeout(()=>label.style.opacity=1,50);
+    }
+    function hideSubtitleForever(){
+      const subtitle=document.getElementById('subtitle');
+      subtitle.classList.add('fade-out');
+      setTimeout(()=>{
+        subtitle.style.display='none';
+        localStorage.setItem('subtitleSeen','true');
+        const label=document.createElement('div');
+        label.textContent="SETTINGS";
+        label.className="settings-label";
+        document.querySelector('#lobby').insertBefore(label, document.getElementById('settings-container'));
+        setTimeout(()=>label.style.opacity=1,50);
+      },1000);
     }
 
-    function savePlayerName() {
-      const input = document.getElementById('player-name-input').value.trim();
-      if (!input) return;
-      localStorage.setItem('playerName', input);
-      document.getElementById('name-prompt').style.display = 'none';
-      document.getElementById('welcome-section').style.display = 'block';
-      document.getElementById('player-name-display').textContent = input;
-      playerName = input;
-    }
-
-    function changeName() {
-      localStorage.removeItem('playerName');
-      document.getElementById('name-prompt').style.display = 'block';
-      document.getElementById('welcome-section').style.display = 'none';
-    }
-
-    // Leaderboard
-    const leaderboards = { easy: [], medium: [], hard: [] };
-    let currentTab = 'easy';
-    function switchTab(tab) {
-      currentTab = tab;
+    // ==== Leaderboard ====
+    const leaderboards={easy:[],medium:[],hard:[]};
+    let currentTab='easy';
+    function switchTab(tab){
+      currentTab=tab;
       document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
       document.querySelector(`.tab:nth-child(${tab==='easy'?1:tab==='medium'?2:3})`).classList.add('active');
       renderLeaderboard();
     }
-    function renderLeaderboard() {
-      const list = document.getElementById('leaderboard-list');
-      list.innerHTML = leaderboards[currentTab].length
+    function renderLeaderboard(){
+      const list=document.getElementById('leaderboard-list');
+      list.innerHTML=leaderboards[currentTab].length
         ? leaderboards[currentTab].map((e,i)=>`<li>${i+1}. ${e.name} — ${e.score}</li>`).join('')
         : '<li>No scores yet</li>';
     }
     renderLeaderboard();
-    document.getElementById('difficulty').addEventListener('change', e=>switchTab(e.target.value));
+    document.getElementById('difficulty').addEventListener('change',e=>switchTab(e.target.value));
 
-    // Game variables
-    const words = ['animal','basket','castle','python','docker','lambda','serverless','zebra','office','market'];
-    const stages = [
-`  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n=========`,
+    // ==== Game Variables ====
+    const words=['animal','basket','castle','python','docker','lambda','serverless','zebra','office','market'];
+    const stages=[`  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n=========`,
 `  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========`,
 `  +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========`,
 `  +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========`,
 `  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========`,
 `  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========`,
 `  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========`];
-    let currentWord='', guessedLetters=[], correctLetters=[], lives=6, gameOver=false;
-    let score=0, difficulty='easy', streak=0, timeLeft=60, freeHintUsed=false, highScoreGlowed=false;
+    let currentWord='',guessedLetters=[],correctLetters=[],lives=6,gameOver=false;
+    let score=0,difficulty='easy',streak=0,timeLeft=60,freeHintUsed=false,highScoreGlowed=false;
     let timer;
 
-    function startSinglePlayer() {
-      const subtitle = document.querySelector('.subtitle');
-      if (!localStorage.getItem('subtitleSeen')) {
-        subtitle.classList.add('fade-out');
-        setTimeout(() => {
-          subtitle.style.display='none';
-          localStorage.setItem('subtitleSeen','true');
-          const label=document.createElement('div');
-          label.textContent="SETTINGS";
-          label.className="settings-label";
-          document.querySelector('#lobby').insertBefore(label, document.getElementById('settings-container'));
-          setTimeout(()=>label.style.opacity=1,50);
-        },1000);
-      }
+    // ==== Start Game ====
+    function startSinglePlayer(){
+      if(!localStorage.getItem('subtitleSeen')) hideSubtitleForever();
       difficulty=document.getElementById('difficulty').value;
-      localStorage.setItem('lastDifficulty',difficulty);
       currentWord=selectWord(difficulty);
-      score=0; streak=0; freeHintUsed=false; highScoreGlowed=false;
+      score=0;streak=0;freeHintUsed=false;highScoreGlowed=false;
       document.getElementById('lobby').style.display='none';
       document.getElementById('game-area').style.display='block';
       startGame();
@@ -250,37 +240,42 @@
       let pool=words.filter(w=>{
         if(level==='easy') return w.length<=6;
         if(level==='medium') return w.length>=7 && w.length<=9;
-        return w.length>=10 || w.length>=6;
+        return w.length>=10||w.length>=6;
       });
       return pool[Math.floor(Math.random()*pool.length)];
     }
 
     function startGame(){
-      guessedLetters=[]; correctLetters=[]; lives=6; gameOver=false; timeLeft=60;
-      updateHUD(); updateDisplay(); createKeyboard(); startTimer();
+      guessedLetters=[];correctLetters=[];lives=6;gameOver=false;timeLeft=60;
+      updateHUD();updateDisplay();createKeyboard();startTimer();
     }
 
+    // ==== HUD & Score ====
     function updateHUD(){
       document.getElementById('hud-line').textContent=`Score: ${score} | Time: ${timeLeft} | Streak: ${streak}`;
       const hsKey=`highScore_${difficulty}`;
       const highScore=localStorage.getItem(hsKey)||0;
       const hsDisplay=document.getElementById('high-score-display');
-      if(highScore>0){ hsDisplay.style.opacity=1; hsDisplay.textContent=`High Score (${difficulty}): ${highScore}`; }
+      if(highScore>0){hsDisplay.style.opacity=1;hsDisplay.textContent=`High Score (${difficulty}): ${highScore}`;}
     }
 
     function updateDisplay(){
-      const wd=document.getElementById('word-display'); wd.innerHTML='';
-      for(let l of currentWord){ const s=document.createElement('span'); s.textContent=correctLetters.includes(l)?l.toUpperCase():''; wd.appendChild(s);}
+      const wd=document.getElementById('word-display');wd.innerHTML='';
+      for(let l of currentWord){
+        const s=document.createElement('span');
+        s.textContent=correctLetters.includes(l)?l.toUpperCase():'';
+        wd.appendChild(s);
+      }
       document.getElementById('lives-display').textContent=`❤️ ${lives}/6 LIVES LEFT`;
       document.getElementById('hangman-display').textContent=stages[lives];
       document.getElementById('guessed-letters').textContent=guessedLetters.length?`Letters guessed: ${guessedLetters.sort().join(', ')}`:'';
     }
 
-    function getPointsPerLetter(){ return difficulty==='easy'?3:difficulty==='medium'?5:10; }
-    function getHintPenalty(){ return difficulty==='easy'?5:difficulty==='medium'?7:15; }
+    function getPointsPerLetter(){return difficulty==='easy'?3:difficulty==='medium'?5:10;}
+    function getHintPenalty(){return difficulty==='easy'?5:difficulty==='medium'?7:15;}
 
     function updateScore(p){
-      score+=p; updateHUD();
+      score+=p;updateHUD();
       const hsKey=`highScore_${difficulty}`;
       let highScore=parseInt(localStorage.getItem(hsKey)||0);
       if(score>highScore){
@@ -288,58 +283,61 @@
         if(!highScoreGlowed){
           const hsDisplay=document.getElementById('high-score-display');
           hsDisplay.classList.add('glow');
-          hsDisplay.textContent+= " ✨";
+          hsDisplay.textContent+=" ✨";
           setTimeout(()=>hsDisplay.classList.remove('glow'),1500);
           highScoreGlowed=true;
         }
       }
     }
 
+    // ==== Gameplay ====
     function makeGuess(letter=null){
       if(gameOver)return;
       const input=document.getElementById('guess-input');
       const guess=(letter||input.value).toLowerCase().trim();
-      if(!guess||guess.length!==1||!/[a-z]/.test(guess)||guessedLetters.includes(guess)){ input.value=''; return;}
+      if(!guess||guess.length!==1||!/[a-z]/.test(guess)||guessedLetters.includes(guess)){input.value='';return;}
       guessedLetters.push(guess);
       if(currentWord.includes(guess)){
-        correctLetters.push(guess); updateScore(getPointsPerLetter());
+        correctLetters.push(guess);updateScore(getPointsPerLetter());
         if(currentWord.split('').every(l=>correctLetters.includes(l))){
-          streak++; if(timeLeft>0)updateScore(20);
-          currentWord=selectWord(difficulty); startGame();
+          streak++;if(timeLeft>0)updateScore(20);
+          currentWord=selectWord(difficulty);startGame();
         }
       } else {
-        lives--; if(lives===0){ gameOver=true; alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nFinal Score: ${score}\nStreak: ${streak}`); location.reload();}
+        lives--;if(lives===0){gameOver=true;alert(`💀 GAME OVER! The word was ${currentWord.toUpperCase()}\nFinal Score: ${score}\nStreak: ${streak}`);location.reload();}
       }
-      updateDisplay(); input.value='';
+      updateDisplay();input.value='';
     }
+
+    // Enter key support on desktop
+    document.getElementById('guess-input').addEventListener('keydown',function(e){
+      if(e.key==='Enter'){e.preventDefault();makeGuess();}
+    });
 
     function useHint(){
       if(gameOver)return;
       let hidden=currentWord.split('').filter(l=>!correctLetters.includes(l));
       if(hidden.length===0)return;
       const r=hidden[Math.floor(Math.random()*hidden.length)];
-      correctLetters.push(r); guessedLetters.push(r);
+      correctLetters.push(r);guessedLetters.push(r);
       if(!freeHintUsed){freeHintUsed=true;}else{updateScore(-getHintPenalty());}
       updateScore(getPointsPerLetter());
       if(currentWord.split('').every(l=>correctLetters.includes(l))){
-        streak++; if(timeLeft>0)updateScore(20);
-        currentWord=selectWord(difficulty); startGame();
+        streak++;if(timeLeft>0)updateScore(20);
+        currentWord=selectWord(difficulty);startGame();
       }
       updateDisplay();
     }
 
     function createKeyboard(){
-      const kb=document.getElementById('keyboard'); kb.innerHTML='';
+      const kb=document.getElementById('keyboard');kb.innerHTML='';
       const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
       rows.forEach(r=>{
-        const rowDiv=document.createElement('div');
-        rowDiv.className='kb-row';
+        const rowDiv=document.createElement('div');rowDiv.className='kb-row';
         r.split('').forEach(l=>{
-          const b=document.createElement('button'); b.textContent=l;
-          b.onclick=()=>{b.disabled=true; makeGuess(l);}; 
-          rowDiv.appendChild(b);
-        });
-        kb.appendChild(rowDiv);
+          const b=document.createElement('button');b.textContent=l;
+          b.onclick=()=>{b.disabled=true;makeGuess(l);};rowDiv.appendChild(b);
+        });kb.appendChild(rowDiv);
       });
     }
 
@@ -353,3 +351,4 @@
   </script>
 </body>
 </html>
+
