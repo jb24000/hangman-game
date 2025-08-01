@@ -2,9 +2,14 @@
 
 _A modern take on the classic word‑guessing game, now as a Progressive Web App (PWA)!_
 
-![Hangman Banner](https://img.icons8.com/color/96/000000/hangman.png)
-
----
+_                                             
+ | |                                            
+ | |__   __ _ _ __   __ _ _ __ ___   __ _ _ __  
+ | '_ \ / _` | '_ \ / _` | '_ ` _ \ / _` | '_ \ 
+ | | | | (_| | | | | (_| | | | | | | (_| | | | |
+ |_| |_|\__,_|_| |_|\__, |_| |_| |_|\__,_|_| |_|
+                     __/ |                      
+                    |___/
 
 ## 🚀 Features
 
