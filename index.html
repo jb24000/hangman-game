@@ -30,7 +30,6 @@
       max-width: 420px;
       margin: auto;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      transition: background 0.5s ease, color 0.5s ease;
     }
     .title {
       text-align: center;
@@ -41,41 +40,17 @@
       gap:10px;
       align-items:center;
     }
-    .subtitle { text-align: center; opacity: 0.8; margin-bottom: 20px; }
-    .settings-label { text-align: center; font-size: 14px; color: #ccc; margin-bottom: 10px; font-weight: bold; }
-
-    select, input {
-      font-size: 18px;
-      padding: 8px;
-      border-radius: 8px;
-      border: none;
-      margin: 5px;
-    }
+    .subtitle { opacity: 1; transition: opacity 0.8s ease; text-align:center; margin-bottom:15px; }
+    .subtitle.hidden { opacity: 0; pointer-events: none; }
+    select, input { font-size: 18px; padding: 8px; border-radius: 8px; border: none; margin: 5px; }
     button {
-      font-size: 18px;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      background: #00ff88;
-      color: #333;
-      font-weight: bold;
-      cursor: pointer;
-      margin: 8px;
+      font-size: 18px; padding: 12px 20px;
+      border: none; border-radius: 8px;
+      background: #00ff88; color: #333; font-weight: bold;
+      cursor: pointer; margin: 8px;
     }
     button:hover { background: #00cc6a; }
-
-    .score-timer {
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      margin: 10px 0;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:10px;
-    }
-    .high-score { text-align: center; font-size: 16px; margin-top: 5px; opacity: 0; }
-
+    .score-timer { text-align: center; font-size: 18px; font-weight: bold; margin: 10px 0; display:flex; justify-content:center; align-items:center; gap:10px; }
     .hangman-display {
       font-family: 'Courier New', monospace;
       white-space: pre;
@@ -90,67 +65,33 @@
       max-width: 280px;
       text-shadow: 0 0 4px rgba(255,255,255,0.5);
     }
-    @media (max-width: 480px) {
-      .hangman-display { font-size: 16px; padding: 15px; }
-    }
-
-    .word-display {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: nowrap;
-      margin: 20px 0;
-    }
-    .word-display span {
-      font-size: 28px;
-      font-weight: bold;
-      min-width: 24px;
-      text-align: center;
-      position: relative;
-    }
-    .word-display span::after {
-      content: "_";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -6px;
-    }
-
+    .word-display { display: flex; justify-content: center; gap: 10px; flex-wrap: nowrap; margin: 20px 0; }
+    .word-display span { font-size: 28px; font-weight: bold; min-width: 24px; text-align: center; position: relative; }
+    .word-display span::after { content: "_"; position: absolute; left: 0; right: 0; bottom: -6px; }
     .input-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      margin: 15px 0;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 10px; margin: 15px 0;
     }
-    @media (min-width: 1024px) {
-      .input-section { flex-direction: row; justify-content: center; }
-    }
-
+    @media (min-width: 1200px) { .input-section { flex-direction: row; justify-content: center; } }
     #keyboard {
       display: none;
-      grid-template-columns: repeat(10, 1fr);
-      gap: 5px;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
       margin-top: 15px;
     }
-    .kb-row { display: contents; }
+    .kb-row { display: flex; justify-content: center; gap: 6px; }
     #keyboard button {
-      min-width: 32px;
-      min-height: 40px;
-      font-size: 18px;
-      border: none;
-      border-radius: 5px;
-      background: #4CAF50;
-      color: white;
-      cursor: pointer;
+      width: 8vw; height: 8vw; max-width: 45px; max-height: 45px;
+      font-size: 5vw;
+      border: none; border-radius: 5px;
+      background: #4CAF50; color: white;
     }
     #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
-
     @media (max-width: 768px) {
       #guess-input, #guess-button { display: none; }
-      #keyboard { display: grid; }
+      #keyboard { display: flex; }
     }
-
     .tabs { display: flex; justify-content: center; margin-bottom: 10px; }
     .tab { flex: 1; padding: 8px; cursor: pointer; border-bottom: 3px solid transparent; text-align:center; }
     .tab.active { border-color: #FFD700; font-weight: bold; color: #FFD700; }
@@ -180,7 +121,6 @@
           <button onclick="changeName()">Change</button>
         </div>
       </div>
-
       <div id="settings-container">
         Difficulty:
         <select id="difficulty">
@@ -195,9 +135,7 @@
           <option value="5">Best of 5</option>
         </select>
       </div>
-
       <button onclick="startSinglePlayer()">Start Game</button>
-
       <div class="leaderboard">
         <div class="leaderboard-title">Leaderboard</div>
         <div class="tabs">
@@ -216,7 +154,6 @@
         <button onclick="toggleTheme()">🌓</button>
         <button class="sound-btn" onclick="toggleSound()">🔊</button>
       </div>
-      <div id="high-score-display" class="high-score"></div>
       <div class="hangman-display" id="hangman-display"></div>
       <div class="word-display" id="word-display"></div>
       <div class="lives-display" id="lives-display"></div>
@@ -231,12 +168,9 @@
   </div>
 
   <script>
-    // ==== Dark Mode Default ====
-    if (localStorage.getItem('theme') === 'light') {
-      document.body.classList.add('light-mode');
-    } else {
-      document.body.classList.add('dark-mode');
-    }
+    // Dark Mode Default
+    if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+    else document.body.classList.add('dark-mode');
     function toggleTheme() {
       if (document.body.classList.contains('dark-mode')) {
         document.body.classList.replace('dark-mode','light-mode');
@@ -247,13 +181,14 @@
       }
     }
 
-    // ==== Sound ====
+    // Sound system
     const sounds = {
       correct: new Audio('correct.mp3'),
       wrong: new Audio('wrong.mp3'),
       win: new Audio('win.mp3'),
       lose: new Audio('lose.mp3')
     };
+    Object.values(sounds).forEach(s=>s.load());
     let soundEnabled = localStorage.getItem('sound') !== 'off';
     function toggleSound() {
       soundEnabled = !soundEnabled;
@@ -267,13 +202,22 @@
     }
     function playSound(type) {
       if (soundEnabled && sounds[type]) {
+        sounds[type].pause();
         sounds[type].currentTime = 0;
-        sounds[type].play();
+        sounds[type].play().catch(()=>{});
       }
     }
     updateSoundButtons();
 
-    // ==== Player Name ====
+    // Subtitle Helper
+    function showSubtitle(message, duration=4000) {
+      const subtitle = document.getElementById('subtitle');
+      subtitle.textContent = message;
+      subtitle.classList.remove('hidden');
+      setTimeout(() => subtitle.classList.add('hidden'), duration);
+    }
+
+    // Player Name
     function savePlayerName(){
       const name=document.getElementById('player-name-input').value.trim();
       if(name){
@@ -294,7 +238,7 @@
       document.getElementById('welcome-section').style.display='block';
     }
 
-    // ==== Leaderboard ====
+    // Leaderboard
     const leaderboards={easy:[],medium:[],hard:[]};
     let currentTab='easy';
     function switchTab(tab){
@@ -311,7 +255,7 @@
     }
     renderLeaderboard();
 
-    // ==== Game Variables ====
+    // Game Variables
     const stages=[`  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n / \\  │\n      │\n═══════`,
 `  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n /    │\n      │\n═══════`,
 `  ┌───┐\n  │   │\n  ○   │\n /│\\  │\n      │\n      │\n═══════`,
@@ -328,6 +272,9 @@
       score=0;streak=0;freeHintUsed=false;gameOver=false;timeLeft=60;
       document.getElementById('lobby').style.display='none';
       document.getElementById('game-area').style.display='block';
+
+      showSubtitle("Guess the word before time runs out!",4000);
+
       startGame();
     }
 
