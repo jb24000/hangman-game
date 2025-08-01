@@ -178,12 +178,12 @@
       max-width: 400px;
     }
     .kb-row {
-      display: flex;
-      justify-content: center;
-      gap: 4px;
-      width: 100%;
-      flex-wrap: wrap;
-    }
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  flex-wrap: nowrap;  /* CHANGED: prevents wrapping */
+}
     #keyboard button {
       min-width: 28px;
       height: 35px;
@@ -199,7 +199,7 @@
     #keyboard button:disabled { background: #aaa; cursor: not-allowed; }
     @media (max-width: 480px) {
       #keyboard { max-width: 100%; gap: 6px; }
-      .kb-row { gap: 3px; flex-wrap: wrap; }
+      .kb-row { gap: 3px; flex-wrap: nowrap; }
       #keyboard button { min-width: 24px; height: 32px; font-size: 12px; margin: 1px; }
     }
     @media (max-width: 360px) {
@@ -264,6 +264,34 @@
     }
     .two-player-choice button { margin: 0 8px; }
     .back-btn { background: #FFD700; color: #222; }
+    @media (max-width: 600px) {
+  html, body {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  body {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .game-container {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    width: 98vw !important;
+    max-width: 98vw !important;
+    max-height: 98vh !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+  }
+}
   </style>
 </head>
 <body>
@@ -396,10 +424,11 @@
 
     // Word banks by difficulty
     const wordBanks = {
-      easy: ['apple','banana','cherry','grape','lemon','melon','peach','pear','plum','kiwi'],
-      medium: ['computer','javascript','hangman','puzzle','challenge','victory','adventure','notebook','holiday','library'],
-      hard: ['xylophone','quizzical','mnemonic','juxtapose','zephyr','rhythm','syzygy','crypt','fjord','glyph']
-    };
+      const wordBanks = {
+  easy: ['animal','basket','button','castle','dinner','eleven','frozen','garden','happy','island','jacket','kitchen','ladder','monkey','number','orange','pencil','rabbit','school','turtle','uncle','valley','window','yellow','zebra','answer','branch','cloudy','donkey','enough','flower','ground','hungry','inside','jungle','kitten','letter','middle','nephew','pickle','ribbon','simple','things','upward','violet','waffle','yogurt','zipper','always','banana','candle','doctor','engine','finger','handle','kindly','listen','market','nature','office','person','quarter','reason','summer','turkey','united','violin','winter','yearly','zombie','apples','bottle','circle','laptop','mouse','screen','coffee','remote','charge','energy','family','friend','memory','silver','golden','planet','rocket','travel','teacher','student','library','eraser','marker','supply','lesson','future','dreams','clouds','light','spring','autumn','forest','desert','river','ocean','giraffe','panda','whale','sharks','eagles','wolves','foxes','puzzle','chicken','soccer','pirate','dragon','wizard','galaxy','meteor','comet','corner','falcon','helmet','insect','jigsaw','recipe','spider','vacuum','walrus','yonder','baboon','chisel','dancer','father','gopher','hammer','infant','jaguar','lumber','mother','nugget','onions','sturdy','toothy','unique','watery','yawned','zinger','anchor','bridge','choppy','dazzle','geyser','hobbit','inform','jackal','kernel','lizard','magnet','nodule','parrot','rescue','sample','thread','uphill','voyage','wrench','zapper','bicycle','example','iceberg','monster','nothing','outside','pumpkin','quietly','somebody','tomorrow','birthday','delivery','friendly','memories','blankets','creature','dinosaur','everyone','festival','magical','sandwich','together','unicorns','vacation','fantasy','heroic','natural','perfect','quality','shelter','tonight','whisper','absorb','attack','beyond','campus','debate','effect','forget','growth','honest','impact','jumper','mental','notice','obtain','reform','symbol','throat','volume','wealth','accept','bigger','copper','deeply','effort','fought','gather','handle','island','jumble','keeper','liquid','minute','normal','oppose','public','rotate','supply','threat','uplift','valley','weight','belief','caught','double','forest','golden','height','impose','junior','kicked','landed','method','nearby','origin','plenty','reward','string','tomato','urgent','vision','wonder','yonder'],
+  medium: ['queen','october','quiver','iguana','notebook','printer','holiday','rainbow','thunder','mountain','valleys','dolphin','rabbits','baseball','hockey','volcano','treasure','spaceship','science','python','variable','function','object','array','coding','server','internet','network','amazon','google','github','docker','oyster','quartz','earwig','kneads','quotas','vulcan','quiche','football','junkyard','enormous','graceful','horrible','jealousy','kindness','nonsense','obtained','pleasant','quarters','recently','skeleton','triangle','universe','villager','yourself','glorious','haunting','inventor','jokester','keyboard','nautical','observed','princess','quantity','whistled','yourself','brilliant','decision','judgment','research','solution','variety','accepted','graphics','harmony','machine','remarks','violent','boundary','document','historic','journal','knuckle','quilts','xylose','zipped','approx','xenial','afraid','before','chance','during','gentle','higher','indeed','locker','modern','native','option','profit','quarry','result','stream','tribal','unfold','victor','xenons','zephyr','action','choice','defeat','entire','global','hushed','injury','joyful','lovely','medium','narrow','openly','pocket','quotes','return','sundae','thrust','unlock','absent','bakery','canyon','deepen','earthy','fabric','gravel','humble','insure','keypad','leader','manage','occupy','packed','quilty','relate','sector','treaty','unable','vector','warmth','xylem','yields','accord','depend','extend','firmly','groups','locked','matrix','revolve','smooth','trains','avenue','brunch','chapel','exceed','hollow','mobile','opened','ranger','stripe','towers','upbeat','asking','border','danger','endless','freeze','goblin','intact','poetry','secure','triple','wisdom','zapped','arctic','bronze','crisis','employ','hunger','lights','member','turban','abroad','budget','carbon','define','expert','length','opener','sketch','victim','muscle','deeper','banner','detail','helper','portal','archer','butter','clover','eleven','hammer','iguana','ladder','monkey','orange','pencil','quiver','school','turtle','uncle','valley','window','yellow','zebra','answer','branch','cloudy','donkey','enough','flower','ground','hungry','inside','jungle','kitten','letter','middle','nephew','october','pickle','quiver','ribbon','simple','things','upward','violet','waffle','yogurt','zipper','always','banana','candle','doctor','engine','finger','handle','iguana','kindly','listen','market','nature','office','person','quarter','reason','summer','turkey','united','violin','winter','yearly','zombie'],
+  hard: ['champion','astronaut','javascript','terraform','lambda','elephant','basketball','spaceship','brilliant','decision','research','solution','universe','variety','accepted','graphics','harmony','machine','natural','perfect','quality','remarks','shelter','tonight','violent','whisper','boundary','document','friendly','historic','journal','machine','natural','perfect','quality','remarks','shelter','tonight','violent','whisper','boundary','xerces','zoning','quoted','threat','weight','xylose','zipped','approx','belief','caught','double','effort','forest','golden','height','impose','junior','kicked','landed','method','nearby','origin','plenty','quoted','reward','string','tomato','urgent','vision','wonder','xenial','yonder','zombie']
+};
 
     // Game state
     let currentWord='',guessedLetters=[],correctLetters=[],lives=6,score=0,streak=0,timeLeft=60,freeHintUsed=false,gameOver=false,timer;
