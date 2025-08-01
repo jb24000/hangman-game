@@ -226,20 +226,23 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
   margin-top: 10px;
   width: 100%;
   max-width: 100%;
+  overflow-x: hidden;
 }
 
 .kb-row {
   display: flex;
   justify-content: center;
-  gap: 4px;
+  flex-wrap: nowrap; /* force row alignment */
 }
 
 #keyboard button {
-  width: 32px;
+  flex: 1 0 auto;
+  margin: 1px;
+  width: 9vw;   /* fits 10 keys across small screens */
+  max-width: 36px;
   height: 40px;
   font-size: 14px;
   font-weight: bold;
@@ -248,7 +251,6 @@ body {
   background: #4CAF50;
   color: white;
   cursor: pointer;
-  flex-shrink: 0;
 }
 
 #keyboard button:disabled {
@@ -258,11 +260,12 @@ body {
 
 @media (max-width: 480px) {
   #keyboard button {
-    width: 8vw;
+    width: 8.5vw; /* slightly smaller for phones */
     height: 36px;
     font-size: 12px;
   }
 }
+
 
     }
     @media (max-width: 360px) {
