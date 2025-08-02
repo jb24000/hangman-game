@@ -495,6 +495,7 @@ body.light-mode {
       <div class="leaderboard">
         <div class="leaderboard-title">Leaderboard</div>
         <div class="tabs">
+          <div class="tab active" onclick="switchTab('kids')">Kids</div>
           <div class="tab active" onclick="switchTab('easy')">Easy</div>
           <div class="tab" onclick="switchTab('medium')">Medium</div>
           <div class="tab" onclick="switchTab('hard')">Hard</div>
@@ -574,12 +575,12 @@ body.light-mode {
     let twoPlayerMode = false, twoPlayerType = '', player1Name = '', player2Name = '', currentPlayer = 1, player1Score = 0, player2Score = 0, customWord = '';
 
     // Leaderboard persistence
-    let leaderboards=JSON.parse(localStorage.getItem('leaderboards'))||{easy:[],medium:[],hard:[]};
+    let leaderboards=JSON.parse(localStorage.getItem('leaderboards'))||{kids:[],easy:[],medium:[],hard:[]};
     let currentTab='medium';
     function switchTab(tab){
       currentTab=tab;
       document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-      document.querySelector(`.tab:nth-child(${tab==='easy'?1:tab==='medium'?2:3})`).classList.add('active');
+      document.querySelector(`.tab:nth-child(${tab==='kids'?1:tab==='easy'?3:4})`).classList.add('active');
       renderLeaderboard();
     }
     function renderLeaderboard(){
@@ -774,7 +775,8 @@ body.light-mode {
         messageEl.textContent=`🆓 Free hint! The letter "${r.toUpperCase()}" was revealed.`;
         messageEl.style.color="#00ff88";
       } else {
-        if(difficulty==='easy') penalty=5;
+        if(difficukty==='kids') penalty=3;
+        else if(difficulty==='easy') penalty=5;
         else if(difficulty==='medium') penalty=7;
         else penalty=15;
         if(twoPlayerMode) {
