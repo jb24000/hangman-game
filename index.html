@@ -77,6 +77,37 @@
     .slider:before { content:""; position:absolute; width:18px; height:18px; left:3px; bottom:3px; background:white; border-radius:50%; transition:.4s; }
     input:checked+.slider { background:#00ff88; }
     input:checked+.slider:before { transform:translateX(26px); }
+    
+    .music-controls { 
+      display: flex; 
+      gap: 8px; 
+      margin: 15px auto 18px auto; 
+      justify-content: center; 
+    }
+    
+    .music-controls button { 
+      font-family: 'Courier New', monospace; 
+      font-size: 14px; 
+      padding: 8px 12px; 
+      border: none; 
+      border-radius: 8px; 
+      background: #00ff88; 
+      color: #222; 
+      font-weight: bold; 
+      cursor: pointer; 
+      transition: background 0.2s, transform 0.1s; 
+      box-shadow: 2px 2px 0px #000; 
+    }
+    
+    .music-controls button:hover { 
+      background: #00cc6a; 
+      transform: translateY(-1px); 
+    }
+    
+    .music-controls button:active { 
+      transform: translateY(0); 
+    }
+    
     select, input[type=text] {
       font-size: 16px;
       padding: 7px;
@@ -249,6 +280,14 @@
       .kb-row:nth-child(3) {
         width: 70%;
       }
+      .music-controls { 
+        margin: 10px auto 15px auto; 
+        gap: 6px; 
+      }
+      .music-controls button { 
+        font-size: 12px; 
+        padding: 6px 8px; 
+      }
     }
     @media (max-width: 360px) {
       #keyboard {
@@ -381,6 +420,17 @@
         <label class="switch"><input type="checkbox" id="soundToggle"><span class="slider"></span></label>
       </label>
     </div>
+    <div class="music-controls">
+      <button id="beeps-only">🎵 Beeps Only</button>
+      <button id="prev-track">⏮ Prev</button>
+      <button id="next-track">Next ⏭</button>
+    </div>
+
+    <!-- YouTube Music Embed (hidden by default) -->
+    <div id="music-player" style="width:0;height:0;overflow:hidden;">
+      <iframe id="yt-music" width="0" height="0" frameborder="0" allow="autoplay; encrypted-media" src=""></iframe>
+    </div>
+
     <div class="subtitle" id="subtitle">Choose your settings to begin</div>
     <div id="lobby">
       <div id="player-section">
@@ -471,6 +521,15 @@
   <audio id="audio-win" src="win.mp3"></audio>
   <audio id="audio-lose" src="lose.mp3"></audio>
   <script>
+    // Music playlist (same as other NES games for consistency)
+    const playlist = [
+      "fs0BCIUQ7Ws", "VpqoE7ft284", "TfEZaH_BBLY", 
+      "V6SJzeegnck", "pzkAKQJv19A", "CIWo9e1Qzos", "WvzVYC507gU"
+    ];
+    let currentTrackIndex = 0;
+    let musicStarted = false;
+    let musicInitialized = false;
+
     // Theme + Sound defaults
     if(!localStorage.getItem('theme')) localStorage.setItem('theme','dark');
     if(!localStorage.getItem('sound')) localStorage.setItem('sound','off');
@@ -489,13 +548,151 @@
       document.querySelector('.game-container').classList.toggle('light-mode',!darkToggle.checked);
       localStorage.setItem('theme',darkToggle.checked?'dark':'light');
     });
-    soundToggle.addEventListener('change',()=>{soundEnabled=soundToggle.checked;localStorage.setItem('sound',soundEnabled?'on':'off');});
+    soundToggle.addEventListener('change',()=>{
+      soundEnabled=soundToggle.checked;
+      localStorage.setItem('sound',soundEnabled?'on':'off');
+      handleSoundToggle(soundEnabled);
+      showFade(soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF');
+    });
 
-    // Sounds
+    // Music functions
+    function handleSoundToggle(soundOn) {
+      if (soundOn) {
+        if (/Safari|iPad/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent)) {
+          showFade('🔊 Sound ON - Beeps Only (Safari Optimized)');
+          return;
+        }
+        showFade('🔊 Sound ON - Click anywhere to start music!');
+      } else {
+        const iframe = document.getElementById('yt-music');
+        if (iframe) iframe.src = '';
+        musicStarted = false;
+        musicInitialized = false;
+        showFade('🔇 Sound OFF');
+      }
+    }
+
+    function initializeMusic() {
+      if (/Safari|iPad/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent)) {
+        showFade('🎵 Retro Beep Mode Active!');
+        musicInitialized = true;
+        return;
+      }
+      
+      if (!soundToggle.checked || musicInitialized) return;
+      musicInitialized = true;
+      loadTrack(0);
+      showFade('🎵 Music Starting!');
+    }
+
+    function loadTrack(index) {
+      if (!soundToggle.checked) return;
+      currentTrackIndex = (index + playlist.length) % playlist.length;
+      const videoId = playlist[currentTrackIndex];
+      const iframe = document.getElementById('yt-music');
+      if (!iframe) return;
+      
+      const newSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=0&controls=0&mute=0&enablejsapi=1&origin=${window.location.origin}&rel=0&start=0&modestbranding=1&playsinline=1&fs=0&cc_load_policy=0&iv_load_policy=3&autohide=1`;
+      iframe.src = newSrc;
+      musicStarted = true;
+      createBeepSound(600, 150);
+      showFade(`🎵 Track ${currentTrackIndex + 1}: Loading...`);
+    }
+
+    function changeTrack(direction) {
+      if (!soundToggle.checked) {
+        showFade('🔇 Turn on sound first!');
+        return;
+      }
+      
+      if (/Safari|iPad/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent)) {
+        createBeepSound(400 + (direction * 200), 300);
+        showFade(`🎵 Beep Track ${Math.abs(direction) === 1 ? (direction > 0 ? 'Up' : 'Down') : 'Change'}`);
+        return;
+      }
+      
+      if (!musicInitialized) {
+        initializeMusic();
+        return;
+      }
+      currentTrackIndex = (currentTrackIndex + direction + playlist.length) % playlist.length;
+      loadTrack(currentTrackIndex);
+    }
+
+    document.addEventListener('click', function(e) {
+      if (soundToggle.checked && !musicInitialized) {
+        initializeMusic();
+      }
+    }, { once: false });
+
+    document.getElementById('prev-track').addEventListener('click', () => changeTrack(-1));
+    document.getElementById('next-track').addEventListener('click', () => changeTrack(1));
+    
+    document.getElementById('beeps-only').addEventListener('click', () => {
+      const iframe = document.getElementById('yt-music');
+      if (iframe) iframe.src = 'about:blank';
+      musicInitialized = false;
+      musicStarted = false;
+      createBeepSound(600, 200);
+      showFade('🎵 Retro Beeps Only Mode!');
+    });
+
+    if (/Safari|iPad/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent)) {
+      const iframe = document.getElementById('yt-music');
+      if (iframe) {
+        iframe.src = 'about:blank';
+        iframe.style.display = 'none';
+      }
+    }
+
+    function createBeepSound(frequency, duration) {
+      if (!soundEnabled) return;
+      
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = frequency || 600;
+        oscillator.type = 'square';
+        
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + (duration || 200) / 1000);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + (duration || 200) / 1000);
+      } catch (e) {
+        console.log('Audio context not available, silent mode');
+      }
+    }
+
+    // Enhanced Sounds with beep fallbacks
     function playSound(type){
       if(!soundEnabled) return;
       let el = document.getElementById('audio-'+type);
-      if(el) { el.currentTime=0; el.play().catch(()=>{}); }
+      if(el && el.src && !el.src.endsWith(window.location.href)) { 
+        el.currentTime=0; 
+        el.play().catch(()=>{
+          // Fallback to beep sounds
+          switch(type) {
+            case 'correct': createBeepSound(800, 200); break;
+            case 'wrong': createBeepSound(300, 500); break;
+            case 'win': createBeepSound(1000, 300); break;
+            case 'lose': createBeepSound(200, 800); break;
+          }
+        }); 
+      } else {
+        // Use beep sounds if no audio files
+        switch(type) {
+          case 'correct': createBeepSound(800, 200); break;
+          case 'wrong': createBeepSound(300, 500); break;
+          case 'win': createBeepSound(1000, 300); break;
+          case 'lose': createBeepSound(200, 800); break;
+        }
+      }
     }
 
     // Hangman stages
@@ -825,6 +1022,8 @@
       difficulty = this.value;
       updateHUD();
     });
+
+    console.log('🎮 Hangman Game with Music Controls initialized! 🎵');
   </script>
 </body>
 </html>
